@@ -31,7 +31,9 @@ bool call_test(string name, std::function<bool(void)> fntest) {
 
 bool trivial_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
-
+		vector<string> files = { "../tests/trivial-test/file1.txt" };
+		Bayan bayan(5, files);
+		/*bayan.read_blocks(files[0]);*/
 		return true;
 	});
 }

@@ -5,6 +5,13 @@ set(SOURCES
 	main.cpp
 	)
 set(HEADERS
+	share.h
+	share-types.h
+	Config.h
+	Block.h
+	Hash.h
+	EqualGroup.h
+	FileReaded.h
 	bayan.h
 	)
 set(TESTS_HEADERS
