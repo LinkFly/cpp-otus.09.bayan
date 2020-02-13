@@ -67,22 +67,16 @@ public:
 using Id = uint8_t;
 using PFileReaded = shared_ptr<FileReaded>;
 
-// TODO vector<paths>
 class Bayan {
-
 	vector<string> files;
 	unsigned blockSize;
-	/*std::map<string, vector<string>> filesHashes;*/
 	vector<PFileReaded> readedFiles;
 	EqualGroupsCollection groupsCol;
 
-//public:
 	enum class CompareResult : int8_t { Unknown = -1, NotEqual, Equal };
 
 private:
 	class CheckTable {
-		//using mapbool = map<Id, bool>;
-		//map<Id, mapbool> negTable;
 		map<std::tuple<Id, Id>, bool> negTable;
 	public:
 		void save(Id idLeft, Id idRight, bool isEqual) {
