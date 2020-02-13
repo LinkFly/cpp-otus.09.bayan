@@ -19,9 +19,10 @@ class Config {
 	
 public:
 	enum class SupportedHashTypes {
-		Debug, // ...
+		Debug, CRC32 // ...
 		/*static const string Debug = "_debug_";*/
 	};
+	static inline const bool isDefaultDisableCache = true;
 	static inline const uint8_t defaultBlockSize = 5;
 	static inline SupportedHashTypes curHashType = SupportedHashTypes::Debug;
 	static inline uint8_t blockSize = defaultBlockSize;

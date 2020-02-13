@@ -72,7 +72,12 @@ void _getWaitStringFromGroupsFiles(const string& testDir, vector<vector<string>>
 	
 }
 
-bool _shareTestCode(const string& testDir, vector<vector<string>>& waitGroups) {
+bool _shareTestCode(const string& testDir, vector<vector<string>>& waitGroups,
+	Config::SupportedHashTypes usingHashType = Config::SupportedHashTypes::Debug
+) {
+	auto lastHashType = Config::curHashType;
+	Config::curHashType = usingHashType;
+	
 	std::ostringstream soutRes, soutWaitRes;
 	_getWaitStringFromGroupsFiles(testDir, waitGroups, soutWaitRes);
 
@@ -86,8 +91,9 @@ bool _shareTestCode(const string& testDir, vector<vector<string>>& waitGroups) {
 	if (!finalRes) {
 		_printDiffResAndWait(testDir, res, waitRes);
 	}
+
+	Config::curHashType = lastHashType;
 	return finalRes;
-	return true;
 }
 bool trivial_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
@@ -137,6 +143,20 @@ bool recurse_test() {
 		});
 }
 
+bool recurse_test_with_crc32() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		return _shareTestCode(
+			"recurse_test",
+			vector<vector<string>>
+			{
+				{"dir1/file1.txt", "dir1/file3.txt", "dir2/subdir21/file1.txt", "dir2/subdir21/file3.txt" },
+				{ "dir1/file2.txt", "dir2/subdir21/file2.txt" }
+			},
+			Config::SupportedHashTypes::CRC32
+		);
+		});
+}
+
 void init_base_fixtures() {
 	// Init code must be here
 	
@@ -159,5 +179,6 @@ BOOST_AUTO_TEST_CASE(test_of_bayan)
 	BOOST_CHECK(trivial_test_2_eq());
 	BOOST_CHECK(trivial_test_2_groups());
 	BOOST_CHECK(recurse_test());
+	/*BOOST_CHECK(recurse_test_with_crc32());*/
 }
 BOOST_AUTO_TEST_SUITE_END()

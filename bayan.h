@@ -72,7 +72,7 @@ class Bayan {
 
 	vector<string> files;
 	unsigned blockSize;
-	std::map<string, vector<string>> filesHashes;
+	/*std::map<string, vector<string>> filesHashes;*/
 	vector<PFileReaded> readedFiles;
 	EqualGroupsCollection groupsCol;
 
@@ -144,98 +144,12 @@ private:
 				return true;
 				});
 		}
-		//if (!result) {
-		//	checkTable.setNotEqual(fileLeft, fileRight);
-		//}
-		//else {
-		//	// TODO Refactor repeat code (see below)
-		//	bool isBothHaveGroups = !fileLeft->isEmptyGroup() && !fileRight->isEmptyGroup();
-		//	bool isOnlyLeftHaveGroup = !fileLeft->isEmptyGroup() && fileRight->isEmptyGroup();
-		//	bool isOnlyRightHaveGroup = fileLeft->isEmptyGroup() && !fileRight->isEmptyGroup();
-		//	bool isBothNoHaveGroups = fileLeft->isEmptyGroup() && fileRight->isEmptyGroup();
-		//	if (isBothHaveGroups) {
-		//		if (fileLeft->eqGroup == fileRight->eqGroup) {
-		//			return;
-		//		}
-		//		else {
-		//			error("For result == true, files mustn't exists into both different groups\n");
-		//		}
-		//	}
-
-		//	if (isBothNoHaveGroups) {
-		//		PEqualGroup eqGroup = std::make_shared<EqualGroup>();
-		//		eqGroup->add(fileLeft);
-		//		fileLeft->eqGroup = eqGroup;
-		//		eqGroup->add(fileRight);
-		//		fileRight->eqGroup = eqGroup;
-		//		groupsCol.add(eqGroup);
-		//		return;
-		//	}
-		//	if (isOnlyLeftHaveGroup) {
-		//		fileLeft->eqGroup->add(fileRight);
-		//		fileRight->eqGroup = fileLeft->eqGroup;
-		//	}
-		//	else if (isOnlyRightHaveGroup) {
-		//		fileRight->eqGroup->add(fileLeft);
-		//		fileLeft->eqGroup = fileRight->eqGroup;
-		//	}
-		//}
 	}
 
-	CompareResult checkCompareResult(PFileReaded& fileLeft, PFileReaded& fileRight, list<PFileReaded> history = list<PFileReaded>{}) {
-		cout << "fileLeft: " << fileLeft->getFilePath() << endl;
-		cout << "fileRight: " << fileRight->getFilePath() << endl;
-		cout << endl;
-
+	CompareResult checkCompareResult(
+		PFileReaded& fileLeft, PFileReaded& fileRight, list<PFileReaded> history = list<PFileReaded>{}
+	) {
 		return checkTable.is(fileLeft->id, fileRight->id);
-		//for (auto other : history) {
-		//	if (other == fileRight)
-		//		return CompareResult::Unknown;
-		//}
-		//bool isBothHaveGroups = !fileLeft->isEmptyGroup() && !fileRight->isEmptyGroup();
-		//bool isOnlyLeftHaveGroup = !fileLeft->isEmptyGroup() && fileRight->isEmptyGroup();
-		//bool isOnlyRightHaveGroup = fileLeft->isEmptyGroup() && !fileRight->isEmptyGroup();
-		//bool isBothNoHaveGroups = fileLeft->isEmptyGroup() && fileRight->isEmptyGroup();
-		//if (isBothHaveGroups || isBothNoHaveGroups) {
-		//	history.push_back(fileRight);
-		//	if (isBothHaveGroups) {
-		//		if (fileLeft->eqGroup == fileRight->eqGroup) {
-		//			return CompareResult::Equal;
-		//		}
-		//		else {
-		//			return CompareResult::NotEqual;
-		//		}
-		//	}
-		//	if (isBothNoHaveGroups) {
-		//		return CompareResult::Unknown;
-		//	}
-		//}
-
-		//////// Exists group in left or in right //////
-		//PEqualGroup curGroup;
-		//PFileReaded curAnalyzedFile;
-		//PFileReaded otherFile;
-		//if (isOnlyLeftHaveGroup) {
-		//	curGroup = fileLeft->eqGroup;
-		//	curAnalyzedFile = fileRight;
-		//	otherFile = fileLeft;
-		//}
-		//if (isOnlyRightHaveGroup) {
-		//	curGroup = fileRight->eqGroup;
-		//	curAnalyzedFile = fileLeft;
-		//	otherFile = fileRight;
-		//}
-
-		//history.push_back(otherFile);
-		//CompareResult checkForFilesInGroup = CompareResult::Unknown;
-		//curGroup->forEachWhile([this, &curAnalyzedFile, &otherFile, &checkForFilesInGroup, &history](PFileReaded file) {
-		//	CompareResult checkRes = checkCompareResult(curAnalyzedFile, file, history);
-		//	if (checkRes == CompareResult::Unknown)
-		//		return true;
-		//	checkForFilesInGroup = checkRes;
-		//	return false;
-		//});
-		//return checkForFilesInGroup;
 	}
 
 	bool compareFilesByBlocks(PFileReaded& fileLeft, PFileReaded& fileRight) {
@@ -265,7 +179,6 @@ private:
 	}
 
 public:
-
 	struct Utils {
 		static string normalizeFilePath(const string& sPath) {
 			return Directory::normalizeFilePath(sPath);
@@ -273,14 +186,13 @@ public:
 	};
 
 	Bayan(uint8_t blockSize, vector<string> files, bool isNotRun = false): blockSize(blockSize), files(files) {
-		cout << "Files: \n------------\n" << endl;
+		/*cout << "Files: \n------------\n" << endl;*/
 		for (auto file : files) {
-			cout << file << endl;
+			/*cout << file << endl;*/
 			auto fileReaded = std::make_shared<FileReaded>(file);
 			readedFiles.push_back(fileReaded);
 		}
 		cout << endl;
-		/*checkTable.init(readedFiles.size());*/
 		if (!isNotRun) {
 			run();
 		}
@@ -311,9 +223,7 @@ public:
 		}
 		else {
 			isEqual = compareFilesByBlocks(fileLeft, fileRight);
-			/*isEqual = true;*/
 			saveCompareResult(fileLeft, fileRight, isEqual);
-			//saveCompareResult(fileLeft, fileRight, true);
 		}
 		
 		

@@ -26,10 +26,7 @@ int main(int argc, char** argv) {
 	////auto kv = map.at(3);
 	//cout << std::get<0>(kv) << endl;
 
-	/*boost::crc_32_type  result;
-	const uint8_t bytes[] = { 0x20, 0x21, 0x22, 0x23, 0x24 };
-	result.process_bytes(bytes, sizeof(bytes));
-	cout << std::hex << result.checksum() << endl;*/
+
 
 	//Config config = Config::getInstance();
 	///*config.blockSize = argv[3];*/

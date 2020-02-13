@@ -104,7 +104,7 @@ class FileReaded {
 public:
 	static inline Id nextId = 0;
 	Id id;
-	bool isDisableCache = true;
+	bool isDisableCache = Config::isDefaultDisableCache;
 	PEqualGroup eqGroup;
 
 	// debugging
