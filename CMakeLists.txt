@@ -12,6 +12,7 @@ set(HEADERS
 	Hash.h
 	EqualGroup.h
 	FileReaded.h
+	Directory.h
 	bayan.h
 	)
 set(TESTS_HEADERS

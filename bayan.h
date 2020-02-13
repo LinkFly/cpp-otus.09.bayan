@@ -1,5 +1,9 @@
 ﻿#pragma once
 
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
+
 #include "share.h"
 
 #include <iostream>
@@ -10,11 +14,13 @@
 #include <map>
 #include <set>
 #include <fstream>
+#include <tuple>
 
 #include <boost/filesystem.hpp>
 
 #include "FileReaded.h"
 #include "Hash.h"
+#include "Directory.h"
 
 using std::cout;
 using std::cerr;
@@ -32,11 +38,23 @@ using std::make_shared;
 
 namespace fs = boost::filesystem;
 
+class EqualGroup : public EqualGroupBase {
+public:
+	friend class EqualGroupBase;
+	void add(PFileReaded file) {
+		string filePath = file->getFilePath();
+		filesSet[filePath] = file;
+	}
+	~EqualGroup() {
+		/*cout << "===================== ~EqualGroup =======================\n";*/
+	}
+};
 
 class EqualGroupsCollection {
 	list<PEqualGroup> equalGroups;
 public:
-	void add(PEqualGroup group) {
+
+	void add(PEqualGroup& group) {
 		equalGroups.push_back(group);
 	}
 	void forEach(std::function<void(PEqualGroup & group)> fnGroupProcess) {
@@ -58,117 +76,169 @@ class Bayan {
 	vector<PFileReaded> readedFiles;
 	EqualGroupsCollection groupsCol;
 
+//public:
+	enum class CompareResult : int8_t { Unknown = -1, NotEqual, Equal };
+
+private:
 	class CheckTable {
-		using vecbool = vector<bool>;
-		vector<vecbool>  negTable;
+		//using mapbool = map<Id, bool>;
+		//map<Id, mapbool> negTable;
+		map<std::tuple<Id, Id>, bool> negTable;
 	public:
-		void init(size_t size) {
-			negTable.resize(size);
-			for (auto& vecBool : negTable) {
-				vecBool.resize(size);
-			}
+		void save(Id idLeft, Id idRight, bool isEqual) {
+			negTable[std::make_tuple(idLeft, idRight)] = isEqual;
+			negTable[std::make_tuple(idRight, idLeft)] = isEqual;
 		}
-		bool isNotEqual(PFileReaded fileLeft, PFileReaded fileRight) {
+		CompareResult is(Id idLeft, Id idRight) {
+			auto ids = std::make_tuple(idLeft, idRight);
+			auto kvIter = negTable.find(ids);
+			if (kvIter == negTable.end()) {
+				return CompareResult::Unknown;
+			}
+			return kvIter->second ? CompareResult::Equal : CompareResult::NotEqual;
+		}
+		//void init(size_t size) {
+		//	/*negTable.resize(size);
+		//	for (auto& vecBool : negTable) {
+		//		vecBool.resize(size);
+		//	}*/
+		//}
+		/*bool isNotEqual(PFileReaded fileLeft, PFileReaded fileRight) {
 			return negTable[fileLeft->id][fileRight->id];
 		}
 		void setNotEqual(PFileReaded fileLeft, PFileReaded fileRight) {
 			negTable[fileLeft->id][fileRight->id] = true;
 			negTable[fileRight->id][fileLeft->id] = true;
-		}
+		}*/
 	} checkTable;
 
-	enum class CompareResult: int8_t { Unknown = -1, NotEqual, Equal };
+	
 
-	void saveCompareResult(PFileReaded fileLeft, PFileReaded fileRight, bool result) {
-		if (!result) {
-			checkTable.setNotEqual(fileLeft, fileRight);
-		}
-		else {
-			// TODO Refactor repeat code (see below)
-			bool isBothHaveGroups = !fileLeft->isEmptyGroup() && !fileRight->isEmptyGroup();
-			bool isOnlyLeftHaveGroup = !fileLeft->isEmptyGroup() && fileRight->isEmptyGroup();
-			bool isOnlyRightHaveGroup = fileLeft->isEmptyGroup() && !fileRight->isEmptyGroup();
-			bool isBothNoHaveGroups = fileLeft->isEmptyGroup() && fileRight->isEmptyGroup();
-			if (isBothHaveGroups) {
-				if (fileLeft->eqGroup == fileRight->eqGroup) {
-					return;
-				}
-				else {
-					error("For result == true, files mustn't exists into both different groups\n");
-				}
-			}
-			if (isBothNoHaveGroups) {
+	void saveCompareResult(PFileReaded& fileLeft, PFileReaded& fileRight, bool result) {
+		checkTable.save(fileLeft->id, fileRight->id, result);
+		if (result) {
+			if (fileLeft->isEmptyGroup() && fileLeft->isEmptyGroup()) {
 				PEqualGroup eqGroup = std::make_shared<EqualGroup>();
-				eqGroup->add(fileLeft);
-				fileLeft->eqGroup = eqGroup;
-				eqGroup->add(fileRight);
-				fileRight->eqGroup = eqGroup;
 				groupsCol.add(eqGroup);
-				return;
+				eqGroup->add(fileLeft);
+				eqGroup->add(fileRight);
+				fileLeft->eqGroup = eqGroup;
+				fileRight->eqGroup = eqGroup;
 			}
-			if (isOnlyLeftHaveGroup) {
-				fileLeft->eqGroup->add(fileRight);
-				fileRight->eqGroup = fileLeft->eqGroup;
-			}
-			else if (isOnlyRightHaveGroup) {
-				fileRight->eqGroup->add(fileLeft);
-				fileLeft->eqGroup = fileRight->eqGroup;
-			}
-		}
-	}
-
-	CompareResult checkCompareResult(PFileReaded fileLeft, PFileReaded fileRight, list<PFileReaded> history = list<PFileReaded>{}) {
-		for (auto other : history) {
-			if (other == fileRight)
-				return CompareResult::Unknown;
-		}
-		bool isBothHaveGroups = !fileLeft->isEmptyGroup() && !fileRight->isEmptyGroup();
-		bool isOnlyLeftHaveGroup = !fileLeft->isEmptyGroup() && fileRight->isEmptyGroup();
-		bool isOnlyRightHaveGroup = fileLeft->isEmptyGroup() && !fileRight->isEmptyGroup();
-		bool isBothNoHaveGroups = fileLeft->isEmptyGroup() && fileRight->isEmptyGroup();
-		if (isBothHaveGroups || isBothNoHaveGroups) {
-			history.push_back(fileRight);
-			if (isBothHaveGroups) {
-				if (fileRight->eqGroup == fileRight->eqGroup) {
-					return CompareResult::Equal;
+			else {
+				if (!fileLeft->isEmptyGroup()) {
+					fileLeft->eqGroup->add(fileRight);
+					fileRight->eqGroup = fileLeft->eqGroup;
 				}
-				else {
-					return CompareResult::NotEqual;
+				if (!fileRight->isEmptyGroup()) {
+					fileRight->eqGroup->add(fileLeft);
+					fileLeft->eqGroup = fileRight->eqGroup;
 				}
 			}
-			if (isBothNoHaveGroups) {
-				return CompareResult::Unknown;
-			}
-		}
-
-		////// Exists group in left or in right //////
-		PEqualGroup curGroup;
-		PFileReaded curAnalyzedFile;
-		PFileReaded otherFile;
-		if (isOnlyLeftHaveGroup) {
-			curGroup = fileLeft->eqGroup;
-			curAnalyzedFile = fileRight;
-			otherFile = fileLeft;
-		}
-		if (isOnlyRightHaveGroup) {
-			curGroup = fileRight->eqGroup;
-			curAnalyzedFile = fileLeft;
-			otherFile = fileRight;
-		}
-
-		history.push_back(otherFile);
-		CompareResult checkForFilesInGroup = CompareResult::Unknown;
-		curGroup->forEachWhile([this, &curAnalyzedFile, &otherFile, &checkForFilesInGroup, &history](PFileReaded file) {
-			CompareResult checkRes = checkCompareResult(curAnalyzedFile, file, history);
-			if (checkRes == CompareResult::Unknown)
+			fileLeft->eqGroup->forEachWhile([this, &fileRight, &result](PFileReaded& file) {
+				checkTable.save(file->id, fileRight->id, true);
 				return true;
-			checkForFilesInGroup = checkRes;
-			return false;
-		});
-		return checkForFilesInGroup;
+				});
+			fileRight->eqGroup->forEachWhile([this, &fileLeft, &result](PFileReaded& file) {
+				checkTable.save(file->id, fileLeft->id, true);
+				return true;
+				});
+		}
+		//if (!result) {
+		//	checkTable.setNotEqual(fileLeft, fileRight);
+		//}
+		//else {
+		//	// TODO Refactor repeat code (see below)
+		//	bool isBothHaveGroups = !fileLeft->isEmptyGroup() && !fileRight->isEmptyGroup();
+		//	bool isOnlyLeftHaveGroup = !fileLeft->isEmptyGroup() && fileRight->isEmptyGroup();
+		//	bool isOnlyRightHaveGroup = fileLeft->isEmptyGroup() && !fileRight->isEmptyGroup();
+		//	bool isBothNoHaveGroups = fileLeft->isEmptyGroup() && fileRight->isEmptyGroup();
+		//	if (isBothHaveGroups) {
+		//		if (fileLeft->eqGroup == fileRight->eqGroup) {
+		//			return;
+		//		}
+		//		else {
+		//			error("For result == true, files mustn't exists into both different groups\n");
+		//		}
+		//	}
+
+		//	if (isBothNoHaveGroups) {
+		//		PEqualGroup eqGroup = std::make_shared<EqualGroup>();
+		//		eqGroup->add(fileLeft);
+		//		fileLeft->eqGroup = eqGroup;
+		//		eqGroup->add(fileRight);
+		//		fileRight->eqGroup = eqGroup;
+		//		groupsCol.add(eqGroup);
+		//		return;
+		//	}
+		//	if (isOnlyLeftHaveGroup) {
+		//		fileLeft->eqGroup->add(fileRight);
+		//		fileRight->eqGroup = fileLeft->eqGroup;
+		//	}
+		//	else if (isOnlyRightHaveGroup) {
+		//		fileRight->eqGroup->add(fileLeft);
+		//		fileLeft->eqGroup = fileRight->eqGroup;
+		//	}
+		//}
 	}
 
-	bool compareFilesByBlocks(PFileReaded fileLeft, PFileReaded fileRight) {
+	CompareResult checkCompareResult(PFileReaded& fileLeft, PFileReaded& fileRight, list<PFileReaded> history = list<PFileReaded>{}) {
+		cout << "fileLeft: " << fileLeft->getFilePath() << endl;
+		cout << "fileRight: " << fileRight->getFilePath() << endl;
+		cout << endl;
+
+		return checkTable.is(fileLeft->id, fileRight->id);
+		//for (auto other : history) {
+		//	if (other == fileRight)
+		//		return CompareResult::Unknown;
+		//}
+		//bool isBothHaveGroups = !fileLeft->isEmptyGroup() && !fileRight->isEmptyGroup();
+		//bool isOnlyLeftHaveGroup = !fileLeft->isEmptyGroup() && fileRight->isEmptyGroup();
+		//bool isOnlyRightHaveGroup = fileLeft->isEmptyGroup() && !fileRight->isEmptyGroup();
+		//bool isBothNoHaveGroups = fileLeft->isEmptyGroup() && fileRight->isEmptyGroup();
+		//if (isBothHaveGroups || isBothNoHaveGroups) {
+		//	history.push_back(fileRight);
+		//	if (isBothHaveGroups) {
+		//		if (fileLeft->eqGroup == fileRight->eqGroup) {
+		//			return CompareResult::Equal;
+		//		}
+		//		else {
+		//			return CompareResult::NotEqual;
+		//		}
+		//	}
+		//	if (isBothNoHaveGroups) {
+		//		return CompareResult::Unknown;
+		//	}
+		//}
+
+		//////// Exists group in left or in right //////
+		//PEqualGroup curGroup;
+		//PFileReaded curAnalyzedFile;
+		//PFileReaded otherFile;
+		//if (isOnlyLeftHaveGroup) {
+		//	curGroup = fileLeft->eqGroup;
+		//	curAnalyzedFile = fileRight;
+		//	otherFile = fileLeft;
+		//}
+		//if (isOnlyRightHaveGroup) {
+		//	curGroup = fileRight->eqGroup;
+		//	curAnalyzedFile = fileLeft;
+		//	otherFile = fileRight;
+		//}
+
+		//history.push_back(otherFile);
+		//CompareResult checkForFilesInGroup = CompareResult::Unknown;
+		//curGroup->forEachWhile([this, &curAnalyzedFile, &otherFile, &checkForFilesInGroup, &history](PFileReaded file) {
+		//	CompareResult checkRes = checkCompareResult(curAnalyzedFile, file, history);
+		//	if (checkRes == CompareResult::Unknown)
+		//		return true;
+		//	checkForFilesInGroup = checkRes;
+		//	return false;
+		//});
+		//return checkForFilesInGroup;
+	}
+
+	bool compareFilesByBlocks(PFileReaded& fileLeft, PFileReaded& fileRight) {
 		if (fileLeft->getSize() != fileRight->getSize()) {
 			return false;
 		}
@@ -187,13 +257,50 @@ class Bayan {
 		fileRight->finishReading();
 		return res;
 	}
+
+	string prepareDir(const string& dir) {
+		// TODO checkint on abs
+		const fs::path workdir = fs::current_path();
+		return (workdir / dir).lexically_normal().string();
+	}
+
 public:
-	Bayan(uint8_t blockSize, vector<string> files): blockSize(blockSize), files(files) {
+
+	struct Utils {
+		static string normalizeFilePath(const string& sPath) {
+			return Directory::normalizeFilePath(sPath);
+		}
+	};
+
+	Bayan(uint8_t blockSize, vector<string> files, bool isNotRun = false): blockSize(blockSize), files(files) {
+		cout << "Files: \n------------\n" << endl;
 		for (auto file : files) {
+			cout << file << endl;
 			auto fileReaded = std::make_shared<FileReaded>(file);
 			readedFiles.push_back(fileReaded);
 		}
-		checkTable.init(readedFiles.size());
+		cout << endl;
+		/*checkTable.init(readedFiles.size());*/
+		if (!isNotRun) {
+			run();
+		}
+	}
+
+	Bayan(uint8_t blockSize, string dir, bool isNotRun = false): 
+		Bayan(blockSize, Directory::getFiles(prepareDir(dir)), isNotRun) {}
+
+	void run() {
+		size_t size = readedFiles.size();
+		for (size_t i = 0; i < size - 1; i++) {
+			auto curLeftFile = readedFiles[i];
+			for (size_t j = i + 1; j < size; j++) {
+				compareFiles(curLeftFile, readedFiles[j]);
+			}
+		}
+		// After we need reset groups into files because unblock smart pointers
+		for (auto& file : readedFiles) {
+			file->eqGroup.reset();
+		}
 	}
 
 	void compareFiles(PFileReaded& fileLeft, PFileReaded& fileRight) {
@@ -204,18 +311,12 @@ public:
 		}
 		else {
 			isEqual = compareFilesByBlocks(fileLeft, fileRight);
+			/*isEqual = true;*/
+			saveCompareResult(fileLeft, fileRight, isEqual);
+			//saveCompareResult(fileLeft, fileRight, true);
 		}
-		saveCompareResult(fileLeft, fileRight, isEqual);
-	}
-
-	void run() {
-		size_t size = readedFiles.size();
-		for (size_t i = 0; i < size - 1; i++) {
-			auto curLeftFile = readedFiles[i];
-			for (size_t j = i + 1; j < size; j++) {
-				compareFiles(curLeftFile, readedFiles[j]);
-			}
-		}
+		
+		
 	}
 
 	void printGroups(std::ostream& out) {

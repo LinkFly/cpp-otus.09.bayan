@@ -16,9 +16,12 @@ public:
 		init(block);
 	}
 	void init(const Block& block) {
-		auto& config = Config::getInstance();
-		// Not implemented (here must read config and hashes)
-		hashBlock = block;
+		if (Config::curHashType == Config::SupportedHashTypes::Debug) {
+			hashBlock = block;
+		}
+		else {
+			// TODO!!!!! Not implemented (here must read config and hashes)
+		}
 	}
 	bool operator==(const Hash& hash) {
 		return hashBlock == hash.hashBlock;

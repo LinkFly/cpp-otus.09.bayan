@@ -5,12 +5,17 @@
 #include <memory>
 #include <vector>
 
+#include <boost/filesystem.hpp>
+
 #include "share.h"
 #include "share-types.h"
 #include "Config.h"
 #include "EqualGroup.h"
 #include "Block.h"
 #include "Hash.h"
+#include "Directory.h"
+
+namespace fs = boost::filesystem;
 
 using std::string;
 using std::ifstream;
@@ -25,6 +30,7 @@ class FileReaded {
 	size_t curBlockNumber = 0;
 	bool isStartedReading = false;
 	vector<shared_ptr<Hash>> blocksHashes;
+	string filePath = "";
 
 	void open() {
 		if (!isOpen()) {
@@ -63,9 +69,11 @@ class FileReaded {
 	}
 
 	bool readBlock(Block& block, size_t blockNumber = 0) {
-		auto blockSize = Config::getInstance().blockSize;
+		/*auto blockSize = Config::getInstance().blockSize;*/
+		auto blockSize = block.size();
+
 		/*std::unique_ptr<char> buf{ new char[blockSize + 1] };*/
-		std::unique_ptr<char> buf{ new char[blockSize] };
+		/*std::unique_ptr<char> buf{ new char[blockSize] };*/
 		/*buf.get()[blockSize] = 0;*/
 		size_t readed = 0;
 		size_t len = getSize();
@@ -77,27 +85,21 @@ class FileReaded {
 		pfile->seekg(curPos);
 
 		// TODO!!! Handling errors
-		pfile->read(buf.get(), blockSize);
+		/*pfile->read(buf.get(), blockSize);*/
+		pfile->read(reinterpret_cast<char*>(block.ptr()), blockSize);
 		size_t curReaded = pfile->gcount();
 		readed += curReaded;
 
 		if (curReaded < blockSize) {
-			addZeros(buf.get(), curReaded);
+			block.addZeros(curReaded);
 		}
 		
 		// to block
-		for (size_t i = 0; i < blockSize; ++i) {
-			block.set(i, buf.get()[i]);
-		}
+		//for (size_t i = 0; i < blockSize; ++i) {
+		//	/*block.set(i, buf.get()[i]);*/
+		//	block.set(i, buf.get()[i]);
+		//}
 		return true;
-	}
-
-	void addZeros(char* buf, size_t readed) {
-		buf += readed;
-		size_t needZeros = Config::getInstance().blockSize - readed;
-		while (needZeros--) {
-			*(buf + needZeros) = 0;
-		}
 	}
 public:
 	static inline Id nextId = 0;
@@ -117,8 +119,16 @@ public:
 		path = filePath;
 	}
 
+	~FileReaded() {
+		/*cout << "===================== ~FileReaded id: " << (int)this->id << "=======================\n";
+		cout << "eqGroup.useCount(): " << eqGroup.use_count() << endl;*/
+	}
+
 	string getFilePath() {
-		return path;
+		if (filePath == "") {
+			filePath = Directory::normalizeFilePath(path);
+		}
+		return filePath;
 	}
 
 	bool isEmptyGroup() {
@@ -164,20 +174,31 @@ public:
 	}
 
 	bool readNextHash(shared_ptr<Hash>& hash) {
+		
 		if (tryGetInCache(hash)) {
 			++curBlockNumber;
 			return true;
 		}
 		maybeStartReading();
-		Block block{ Config::getInstance().blockSize };
+
+		auto blockSize = Config::blockSize;
+		Block block{ blockSize };
+
+		//shared_ptr<Block> block = std::make_shared<Block>(blockSize);
+		/*auto block = new Block(5);
+		delete block;*/
 		auto res = readBlock(block, curBlockNumber);
+		//bool res = false;
 		if (!res) {
 			finishReading();
 			return false;
 		}
 		++curBlockNumber;
+
+		//return false;
+		/*hash.swap(std::make_shared<Hash>());*/
 		hash = std::make_shared<Hash>(block);
-		blocksHashes.push_back(hash);
+		/*blocksHashes.push_back(hash);*/
 		return true;
 	}
 };
