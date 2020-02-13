@@ -97,19 +97,6 @@ private:
 			}
 			return kvIter->second ? CompareResult::Equal : CompareResult::NotEqual;
 		}
-		//void init(size_t size) {
-		//	/*negTable.resize(size);
-		//	for (auto& vecBool : negTable) {
-		//		vecBool.resize(size);
-		//	}*/
-		//}
-		/*bool isNotEqual(PFileReaded fileLeft, PFileReaded fileRight) {
-			return negTable[fileLeft->id][fileRight->id];
-		}
-		void setNotEqual(PFileReaded fileLeft, PFileReaded fileRight) {
-			negTable[fileLeft->id][fileRight->id] = true;
-			negTable[fileRight->id][fileLeft->id] = true;
-		}*/
 	} checkTable;
 
 	
