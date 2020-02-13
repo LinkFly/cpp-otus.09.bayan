@@ -42,21 +42,26 @@ void _printDiffResAndWait(const string& testName, const string& res, const strin
 
 const string relpathPrefix{ "../tests/" };
 
-void _getWaitGroupsFiles(const string& testDir, vector<vector<string>>& waitGroups) {
-	for (vector<string>& group : waitGroups) {
-		size_t idx = 0;
+vector<vector<string>> _getWaitGroupsFiles(const string& testDir, const vector<vector<string>>& waitGroups) {
+	vector<vector<string>> res;
+	for (vector<string> group : waitGroups) {
+		/*size_t idx = 0;*/
+		vector<string> curGroup;
 		for (string& file : group) {
 			auto relFile = relpathPrefix + testDir + "/" + file;
 			string curFile = Bayan::Utils::normalizeFilePath(relFile);
-			group[idx++] = curFile;
+			/*group[idx++] = curFile;*/
+			curGroup.push_back(curFile);
 		}
+		res.push_back(curGroup);
 	}
+	return res;
 }
 
-void _getWaitStringFromGroupsFiles(const string& testDir, vector<vector<string>>& waitGroups, std::ostringstream& sout) {
-	_getWaitGroupsFiles(testDir, waitGroups);
+void _getWaitStringFromGroupsFiles(const string& testDir, const vector<vector<string>>& waitGroups, std::ostringstream& sout) {
+	auto prepareWaitGroups = _getWaitGroupsFiles(testDir, waitGroups);
 
-	for (vector<string>& group : waitGroups) {
+	for (vector<string>& group : prepareWaitGroups) {
 		// using map because using map into EqualGroup
 		std::map<string, bool> waitFiles;
 		// TODO to sort groups
@@ -72,7 +77,7 @@ void _getWaitStringFromGroupsFiles(const string& testDir, vector<vector<string>>
 	
 }
 
-bool _shareTestCode(const string& testDir, vector<vector<string>>& waitGroups,
+bool _shareTestCode(const string& testDir, const vector<vector<string>>& waitGroups,
 	Config::SupportedHashTypes usingHashType = Config::SupportedHashTypes::Debug
 ) {
 	auto lastHashType = Config::curHashType;
@@ -132,28 +137,27 @@ bool trivial_test_2_groups() {
 		});
 }
 
+const vector<vector<string>> waitGroupsForRecurseLikeTests = vector<vector<string>>
+{
+	{"dir1/file1.txt", "dir1/file3.txt", "dir2/subdir21/file1.txt", "dir2/subdir21/file3.txt" },
+	{ "dir1/file2.txt", "dir2/subdir21/file2.txt" }
+};
+
 bool recurse_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
-		return _shareTestCode("recurse_test", vector<vector<string>>
-		{
-			{"dir1/file1.txt", "dir1/file3.txt", "dir2/subdir21/file1.txt", "dir2/subdir21/file3.txt" },
-			{ "dir1/file2.txt", "dir2/subdir21/file2.txt" }
-		}
-		);
-		});
+		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests);
+	});
 }
 
 bool recurse_test_with_crc32() {
 	return call_test(__PRETTY_FUNCTION__, []() {
-		return _shareTestCode(
-			"recurse_test",
-			vector<vector<string>>
-			{
-				{"dir1/file1.txt", "dir1/file3.txt", "dir2/subdir21/file1.txt", "dir2/subdir21/file3.txt" },
-				{ "dir1/file2.txt", "dir2/subdir21/file2.txt" }
-			},
-			Config::SupportedHashTypes::CRC32
-		);
+		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, Config::SupportedHashTypes::CRC32);
+	});
+}
+
+bool recurse_test_with_md5() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, Config::SupportedHashTypes::MD5);
 		});
 }
 
@@ -179,6 +183,7 @@ BOOST_AUTO_TEST_CASE(test_of_bayan)
 	BOOST_CHECK(trivial_test_2_eq());
 	BOOST_CHECK(trivial_test_2_groups());
 	BOOST_CHECK(recurse_test());
-	/*BOOST_CHECK(recurse_test_with_crc32());*/
+	BOOST_CHECK(recurse_test_with_crc32());
+	BOOST_CHECK(recurse_test_with_md5());
 }
 BOOST_AUTO_TEST_SUITE_END()

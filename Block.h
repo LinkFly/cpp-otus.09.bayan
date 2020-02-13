@@ -63,7 +63,7 @@ public:
 	}
 
 	void addZeros(size_t readed) {
-		uint8_t* buf  =ptr() + readed;
+		uint8_t* buf = ptr() + readed;
 		size_t needZeros = size() - readed;
 		while (needZeros--) {
 			*(buf + needZeros) = 0;

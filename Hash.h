@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include <boost/crc.hpp>
+#include <boost/uuid/detail/md5.hpp>
 
 #include "Block.h"
 #include "Config.h"
@@ -12,25 +13,41 @@
 using std::vector;
 
 class Hash {
-	uint32_t evalCRC32(const Block& block) {
+	//// Utils
+	void uint8ArrayToHash(const uint8_t* arBytes, size_t arSize) {
+		hashBlock.init(arSize);
+		memcpy(hashBlock.ptr(), arBytes, arSize);
+	}
+	//// end Utils
+
+	void handlingCRC32(Block& block) {
 		boost::crc_32_type  result;
 		const uint8_t bytes[] = { 0x20, 0x21, 0x22, 0x23, 0x24 };
-		result.process_bytes(bytes, sizeof(bytes));
-		return result.checksum();
+		result.process_bytes(block.ptr(), block.size());
+		uint32_t intRes = result.checksum();
+		uint8ArrayToHash(reinterpret_cast<uint8_t*>(&intRes), sizeof(intRes));
 	}
 
-	void handlingCRC32(const Block& block) {
-		uint32_t intRes = evalCRC32(block);
-		hashBlock.init(sizeof(intRes));
-		memcpy(hashBlock.ptr(), reinterpret_cast<uint8_t*>(&intRes), sizeof(intRes));
+	void handlingMD5(Block& block) {
+		using boost::uuids::detail::md5;
+		md5 hash;
+		md5::digest_type digest;
+		hash.process_bytes(block.ptr(), block.size());
+		hash.get_digest(digest);
+		uint8ArrayToHash(reinterpret_cast<uint8_t*>(&digest), sizeof(digest));
 	}
+
+
+
 public:
 	Block hashBlock;
 	Hash() = default;
-	Hash(const Block& block) {
+	// TODO! To mind: how use const Block&
+	Hash(Block& block) {
+		
 		init(block);
 	}
-	void init(const Block& block) {
+	void init(Block& block) {
 		//if (Config::curHashType == ) {
 		//	hashBlock = block;
 		//}
@@ -42,7 +59,10 @@ public:
 			hashBlock = block;
 			break;
 		case Config::SupportedHashTypes::CRC32:
-			evalCRC32(block);
+			handlingCRC32(block);
+			break;
+		case Config::SupportedHashTypes::MD5:
+			handlingMD5(block);
 			break;
 		}
 	}

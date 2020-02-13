@@ -198,7 +198,7 @@ public:
 		//return false;
 		/*hash.swap(std::make_shared<Hash>());*/
 		hash = std::make_shared<Hash>(block);
-		/*blocksHashes.push_back(hash);*/
+		blocksHashes.push_back(hash);
 		return true;
 	}
 };
