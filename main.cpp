@@ -2,10 +2,9 @@
 
 #include <iostream>
 #include <sstream>
+#include <memory>
 
 #include <boost/filesystem.hpp>
-
-
 
 #include "Config.h"
 #include "bayan.h"
@@ -66,6 +65,11 @@ int main(int argc, char** argv) {
 	for (int i = 3; i < argc; ++i) {
 		files.push_back(string{ argv[i] });
 	}
+
+	bool isDir = false;
+	if (files.size() == 1) {
+		isDir = fs::is_directory(files[0]);
+	}
 	
 	// TODO Использовать Config через Bayan
 	Config::blockSize = blockSize;
@@ -81,11 +85,17 @@ int main(int argc, char** argv) {
 	// TODO! blockSize - don't using ??
 
 	// TODO!!!!! Signal on error, when files path
-	Bayan bayan(Config::blockSize, files);
+	std::unique_ptr<Bayan> pbayan;
+	if (isDir) {
+		pbayan = std::make_unique<Bayan>(Config::blockSize, files[0]);
+	}
+	else {
+		pbayan = std::make_unique<Bayan>(Config::blockSize, files);
+	}
 
 	/*bayan.run();*/
 	// TODO Delete newlines before output
-	bayan.printGroups(cout);
+	pbayan->printGroups(cout);
 
 	/*Bayan bayan2(3, "../tests");
 	bayan2.printGroups(cout);*/
