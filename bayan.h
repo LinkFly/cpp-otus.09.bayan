@@ -18,9 +18,10 @@
 
 #include <boost/filesystem.hpp>
 
+#include "BayanConfig.h"
 #include "FileReaded.h"
 #include "Hash.h"
-#include "Directory.h"
+#include "FilesUtils.h"
 
 using std::cout;
 using std::cerr;
@@ -69,9 +70,9 @@ using PFileReaded = shared_ptr<FileReaded>;
 
 class Bayan {
 	vector<string> files;
-	unsigned blockSize;
 	vector<PFileReaded> readedFiles;
 	EqualGroupsCollection groupsCol;
+	const BayanConfig& config;
 
 	enum class CompareResult : int8_t { Unknown = -1, NotEqual, Equal };
 
@@ -93,7 +94,7 @@ private:
 		}
 	} checkTable;
 
-	
+
 
 	void saveCompareResult(PFileReaded& fileLeft, PFileReaded& fileRight, bool result) {
 		checkTable.save(fileLeft->id, fileRight->id, result);
@@ -154,23 +155,23 @@ private:
 	}
 
 	string prepareDir(const string& dir) {
-		// TODO checkint on abs
-		const fs::path workdir = fs::current_path();
-		return (workdir / dir).lexically_normal().string();
+		auto dirPath = fs::path{ dir };
+		if (!dirPath.is_absolute()) {
+			dirPath = (fs::current_path() / dirPath);
+		}
+		return dirPath.lexically_normal().string();
 	}
 
 public:
 	struct Utils {
 		static string normalizeFilePath(const string& sPath) {
-			return Directory::normalizeFilePath(sPath);
+			return FilesUtils::normalizeFilePath(sPath);
 		}
 	};
 
-	Bayan(uint8_t blockSize, vector<string> files, bool isNotRun = false): blockSize(blockSize), files(files) {
-		/*cout << "Files: \n------------\n" << endl;*/
+	Bayan(const BayanConfig& config, vector<string> files, bool isNotRun = false): config(config), files(files) {
 		for (auto file : files) {
-			/*cout << file << endl;*/
-			auto fileReaded = std::make_shared<FileReaded>(file);
+			auto fileReaded = std::make_shared<FileReaded>(file, config);
 			readedFiles.push_back(fileReaded);
 		}
 		cout << endl;
@@ -179,8 +180,8 @@ public:
 		}
 	}
 
-	Bayan(uint8_t blockSize, string dir, bool isNotRun = false): 
-		Bayan(blockSize, Directory::getFiles(prepareDir(dir)), isNotRun) {}
+	Bayan(const BayanConfig& config, string dir, bool isNotRun = false):
+		Bayan(config, FilesUtils::getFiles(prepareDir(dir)), isNotRun) {}
 
 	void run() {
 		size_t size = readedFiles.size();
@@ -206,8 +207,6 @@ public:
 			isEqual = compareFilesByBlocks(fileLeft, fileRight);
 			saveCompareResult(fileLeft, fileRight, isEqual);
 		}
-		
-		
 	}
 
 	void printGroups(std::ostream& out) {

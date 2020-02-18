@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.16.2)
 project(bayan VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 
 set(SOURCES
@@ -7,19 +7,20 @@ set(SOURCES
 set(HEADERS
 	share.h
 	share-types.h
-	Config.h
+	BayanConfig.h
 	Block.h
 	Hash.h
 	EqualGroup.h
 	FileReaded.h
-	Directory.h
-	bayan.h
+	FilesUtils.h
+	Bayan.h
+	Arguments.h
 	)
 set(TESTS_HEADERS
-	
+
 	)
 set(DATA_FILES
-	
+	Readme.md
 
 	)
 
@@ -30,15 +31,22 @@ set_target_properties(bayan tests PROPERTIES
 	CXX_STANDARD_REQUIRED ON
 	)
 
-find_package(Boost COMPONENTS unit_test_framework filesystem REQUIRED)
+find_package(Boost COMPONENTS unit_test_framework filesystem program_options REQUIRED)
 
 target_link_libraries(bayan
-	${Boost_LIBRARIES}
+# Disable all boost libraries link (will be concrete linking)
+	#${Boost_LIBRARIES}
+	${Boost_FILESYSTEM_LIBRARY}
+# options_library don't work as dynamic library
+	#${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
 target_link_libraries(tests
 	${Boost_LIBRARIES}
 )
+
+message("[INFO] Boost libs: ${Boost_LIBRARIES}")
+message("[INFO] Boost inc: inc:${Boost_INCLUDE_DIR}")
 
 set_target_properties(bayan tests PROPERTIES
 	COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK

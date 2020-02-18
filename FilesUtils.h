@@ -14,7 +14,7 @@ using std::cout;
 using std::endl;
 
 
-class Directory {
+class FilesUtils {
 public:
 	static vector<string> getFiles(const string& dir) {
 		vector<string> res;
@@ -24,11 +24,6 @@ public:
 				res.push_back(sFile);
 			}
 		}
-		//cout << "recusive walking into: " << dir << endl << "---------------------" << endl;
-		//for (auto& file: res) {
-		//	cout << file << endl;
-		//}
-		//cout << "---------------------" << endl;
 		return res;
 	}
 
@@ -40,5 +35,4 @@ public:
 		fs::path workdir = fs::current_path();
 		return (workdir / fsPath).lexically_normal().generic_string();
 	}
-	
 };

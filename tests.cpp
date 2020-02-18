@@ -74,19 +74,20 @@ void _getWaitStringFromGroupsFiles(const string& testDir, const vector<vector<st
 		}
 		sout << endl;
 	}
-	
+
 }
 
 bool _shareTestCode(const string& testDir, const vector<vector<string>>& waitGroups,
-	Config::SupportedHashTypes usingHashType = Config::SupportedHashTypes::Debug
+	SupportedHashTypes usingHashType = SupportedHashTypes::Debug
 ) {
-	auto lastHashType = Config::curHashType;
-	Config::curHashType = usingHashType;
-	
+	BayanConfig config;
+	config.blockSize = 5;
+	config.curHashType = usingHashType;
+
 	std::ostringstream soutRes, soutWaitRes;
 	_getWaitStringFromGroupsFiles(testDir, waitGroups, soutWaitRes);
 
-	Bayan bayan(5, relpathPrefix + testDir, true);
+	Bayan bayan(config, relpathPrefix + testDir, true);
 	bayan.run();
 	bayan.printGroups(soutRes);
 	cout << "Result:\n-----------\n" << soutRes.str() << "-------------------" << endl;
@@ -97,7 +98,6 @@ bool _shareTestCode(const string& testDir, const vector<vector<string>>& waitGro
 		_printDiffResAndWait(testDir, res, waitRes);
 	}
 
-	Config::curHashType = lastHashType;
 	return finalRes;
 }
 bool trivial_test() {
@@ -151,19 +151,25 @@ bool recurse_test() {
 
 bool recurse_test_with_crc32() {
 	return call_test(__PRETTY_FUNCTION__, []() {
-		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, Config::SupportedHashTypes::CRC32);
+		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, SupportedHashTypes::CRC32);
 	});
 }
 
 bool recurse_test_with_md5() {
 	return call_test(__PRETTY_FUNCTION__, []() {
-		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, Config::SupportedHashTypes::MD5);
+		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, SupportedHashTypes::MD5);
+		});
+}
+
+bool recurse_test_with_sha1() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, SupportedHashTypes::SHA1);
 		});
 }
 
 void init_base_fixtures() {
 	// Init code must be here
-	
+
 }
 
 struct Init {
@@ -185,5 +191,6 @@ BOOST_AUTO_TEST_CASE(test_of_bayan)
 	BOOST_CHECK(recurse_test());
 	BOOST_CHECK(recurse_test_with_crc32());
 	BOOST_CHECK(recurse_test_with_md5());
+	BOOST_CHECK(recurse_test_with_sha1());
 }
 BOOST_AUTO_TEST_SUITE_END()

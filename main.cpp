@@ -5,12 +5,11 @@
 #include <memory>
 
 #include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
 
-#include "Config.h"
-#include "bayan.h"
-
-// TODO remove Debugging code
-//#include "Directory.h"
+#include "Arguments.h"
+#include "BayanConfig.h"
+#include "Bayan.h"
 
 namespace fs = boost::filesystem;
 
@@ -18,87 +17,43 @@ using std::cout;
 using std::endl;
 
 void help() {
-	// TODO!!! Write help
-	cout << "Welcome bayan! Params: " << endl;
+	Arguments::showDesc();
 }
 
-uint8_t normlizeBlockSize(const string& sBlockSize) {
-	std::istringstream iss(sBlockSize);
-	// TODO!!! Поменять blockSize (везде) на size_t
-	uint8_t size;
-	iss >> size;
-	if (size <= 0) {
+void checkBlockSize(const size_t& blockSize) {
+	if (blockSize <= 0) {
+		help();
+		error("Bad block size");
+	}
+}
+
+SupportedHashTypes normalizeHashType(const string& sHashType) {
+	SupportedHashTypes curHashType;
+	bool res = BayanConfig::toSupportedHashType(sHashType, curHashType);
+	if (!res) {
 		help();
 		exit(-1);
 	}
-	return size;
-}
-
-Config::SupportedHashTypes normlizeHashType(const string& sHashType) {
-	if (sHashType == "crc32") {
-		return Config::SupportedHashTypes::CRC32;
-	}
-	else if (sHashType == "md5") {
-		return Config::SupportedHashTypes::MD5;
-	}
-	else {
-		help();
-		exit(-1);
-	}
+	return curHashType;
 }
 
 int main(int argc, char** argv) {
+	Arguments::parse(argc, argv);
 
-	// TODO make parser arguments with boost
-	if (argc < 4) {
-		help();
-		return -1;
-	}
+	checkBlockSize(Arguments::blockSize);
+	SupportedHashTypes hashType = normalizeHashType(Arguments::hashType);
+	BayanConfig config{Arguments::blockSize , hashType};
 
-	string sBlockSize = argv[1];
-	uint8_t blockSize = normlizeBlockSize(sBlockSize);
-
-	string sHashType = argv[2];
-	Config::SupportedHashTypes hashType = normlizeHashType(sHashType);
-
-	vector<string> files;
-	for (int i = 3; i < argc; ++i) {
-		files.push_back(string{ argv[i] });
-	}
-
-	bool isDir = false;
-	if (files.size() == 1) {
-		isDir = fs::is_directory(files[0]);
-	}
-	
-	// TODO Использовать Config через Bayan
-	Config::blockSize = blockSize;
-	Config::curHashType = hashType;
-
-	//Config config = Config::getInstance();
-	///*config.blockSize = argv[3];*/
-	//config.blockSize = 5;
-	Config::blockSize = 5;
-
-	// Allow set directories instead files
-	//Bayan bayan(3, { "../tests/trivial-test/file1.txt", "../tests/trivial-test/file2.txt" , "../tests/trivial-test/file3.txt" });
-	// TODO! blockSize - don't using ??
-
-	// TODO!!!!! Signal on error, when files path
 	std::unique_ptr<Bayan> pbayan;
-	if (isDir) {
-		pbayan = std::make_unique<Bayan>(Config::blockSize, files[0]);
+	if (Arguments::dir != "") {
+		pbayan = std::make_unique<Bayan>(config, Arguments::dir);
 	}
 	else {
-		pbayan = std::make_unique<Bayan>(Config::blockSize, files);
+		pbayan = std::make_unique<Bayan>(config, Arguments::files);
 	}
 
-	/*bayan.run();*/
 	// TODO Delete newlines before output
 	pbayan->printGroups(cout);
-
-	/*Bayan bayan2(3, "../tests");
-	bayan2.printGroups(cout);*/
 
 	return 0;
 }

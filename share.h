@@ -4,6 +4,7 @@
 #include <iostream>
 
 using std::cerr;
+using std::endl;
 using std::string;
 
 #ifdef _MSC_VER
@@ -11,6 +12,6 @@ using std::string;
 #endif
 
 void error(const string& errMes, int errCode = -1) {
-	cerr << errMes;
+	cerr << errMes << endl;
 	exit(errCode);
 }

@@ -9,11 +9,11 @@
 
 #include "share.h"
 #include "share-types.h"
-#include "Config.h"
+#include "BayanConfig.h"
 #include "EqualGroup.h"
 #include "Block.h"
 #include "Hash.h"
-#include "Directory.h"
+#include "FilesUtils.h"
 
 namespace fs = boost::filesystem;
 
@@ -22,7 +22,6 @@ using std::ifstream;
 using std::vector;
 using std::shared_ptr;
 
-// TODO!!! Handling errors
 class FileReaded {
 	string path{};
 	std::unique_ptr<ifstream> pfile;
@@ -31,14 +30,24 @@ class FileReaded {
 	bool isStartedReading = false;
 	vector<shared_ptr<Hash>> blocksHashes;
 	string filePath = "";
+	const BayanConfig& config;
+
+	void maybeError() {
+		if (!pfile->good() && !pfile->eof()) {
+			error("Input/output error");
+		}
+	}
 
 	void open() {
 		if (!isOpen()) {
 			pfile.reset(new ifstream{});
-			if (isDisableCache) {
+			maybeError();
+			if (config.isDisableCache) {
 				pfile->rdbuf()->pubsetbuf(nullptr, 0);
+				maybeError();
 			}
 			pfile->open(path);
+			maybeError();
 			size = fileLen(*pfile);
 		}
 	}
@@ -51,6 +60,7 @@ class FileReaded {
 	void close() {
 		if (isOpen()) {
 			pfile->close();
+			maybeError();
 			pfile.reset(nullptr);
 		}
 	}
@@ -62,19 +72,19 @@ class FileReaded {
 	// For use immediately after file opening
 	size_t fileLen(ifstream& file) {
 		auto fpos = pfile->tellg();
+		maybeError();
 		pfile->seekg(0, std::ios::end);
-		size_t res = pfile->tellg() - fpos;
+		maybeError();
+		auto curPos = pfile->tellg();
+		maybeError();
+		size_t res = curPos - fpos;
 		pfile->seekg(fpos);
+		maybeError();
 		return res;
 	}
 
 	bool readBlock(Block& block, size_t blockNumber = 0) {
-		/*auto blockSize = Config::getInstance().blockSize;*/
 		auto blockSize = block.size();
-
-		/*std::unique_ptr<char> buf{ new char[blockSize + 1] };*/
-		/*std::unique_ptr<char> buf{ new char[blockSize] };*/
-		/*buf.get()[blockSize] = 0;*/
 		size_t readed = 0;
 		size_t len = getSize();
 
@@ -83,50 +93,32 @@ class FileReaded {
 			return false;
 		}
 		pfile->seekg(curPos);
+		maybeError();
 
-		// TODO!!! Handling errors
-		/*pfile->read(buf.get(), blockSize);*/
-		pfile->read(reinterpret_cast<char*>(block.ptr()), blockSize);
+		pfile->read(reinterpret_cast<char*>(block.data()), blockSize);
+		maybeError();
 		size_t curReaded = pfile->gcount();
+		maybeError();
 		readed += curReaded;
 
 		if (curReaded < blockSize) {
 			block.addZeros(curReaded);
 		}
-		
-		// to block
-		//for (size_t i = 0; i < blockSize; ++i) {
-		//	/*block.set(i, buf.get()[i]);*/
-		//	block.set(i, buf.get()[i]);
-		//}
 		return true;
 	}
 public:
 	static inline Id nextId = 0;
 	Id id;
-	bool isDisableCache = Config::isDefaultDisableCache;
 	PEqualGroup eqGroup;
 
-	// debugging
-	int _count = 0;
-	int _max = 3;
-
-	FileReaded() {
+	FileReaded(const string& filePath, const BayanConfig& config): /*FileReaded()*/ config { config } {
 		id = nextId++;
-	}
-
-	FileReaded(const string& filePath): FileReaded() {
 		path = filePath;
-	}
-
-	~FileReaded() {
-		/*cout << "===================== ~FileReaded id: " << (int)this->id << "=======================\n";
-		cout << "eqGroup.useCount(): " << eqGroup.use_count() << endl;*/
 	}
 
 	string getFilePath() {
 		if (filePath == "") {
-			filePath = Directory::normalizeFilePath(path);
+			filePath = FilesUtils::normalizeFilePath(path);
 		}
 		return filePath;
 	}
@@ -136,15 +128,7 @@ public:
 	}
 
 	size_t getSize() {
-		bool wasClose = !isOpen();
-		if (!wasClose) {
-			return size;
-		}
-		// TODO commented - not obvious saved to size, refactor it
-		open();
-		if (wasClose)
-			close();
-		return size;
+		return fs::file_size(path);
 	}
 
 	void startReading() {
@@ -174,30 +158,23 @@ public:
 	}
 
 	bool readNextHash(shared_ptr<Hash>& hash) {
-		
 		if (tryGetInCache(hash)) {
 			++curBlockNumber;
 			return true;
 		}
 		maybeStartReading();
 
-		auto blockSize = Config::blockSize;
+		auto blockSize = config.blockSize;
 		Block block{ blockSize };
 
-		//shared_ptr<Block> block = std::make_shared<Block>(blockSize);
-		/*auto block = new Block(5);
-		delete block;*/
 		auto res = readBlock(block, curBlockNumber);
-		//bool res = false;
 		if (!res) {
 			finishReading();
 			return false;
 		}
 		++curBlockNumber;
 
-		//return false;
-		/*hash.swap(std::make_shared<Hash>());*/
-		hash = std::make_shared<Hash>(block);
+		hash = std::make_shared<Hash>(block, config.curHashType);
 		blocksHashes.push_back(hash);
 		return true;
 	}
