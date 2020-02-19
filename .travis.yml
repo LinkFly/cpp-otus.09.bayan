@@ -6,6 +6,7 @@ addons:
     packages:
      - libboost-test-dev
      - libboost-filesystem-dev
+     - libboost-program-options-dev
      #- python3-pip
 #    - libboost-all-dev # it works
 
