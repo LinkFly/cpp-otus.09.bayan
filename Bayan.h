@@ -62,8 +62,6 @@ class Bayan {
 		}
 	} checkTable;
 
-
-
 	void saveCompareResult(PFileReaded& fileLeft, PFileReaded& fileRight, bool result) {
 		checkTable.save(fileLeft->id, fileRight->id, result);
 		if (result) {
@@ -154,7 +152,6 @@ public:
 			auto fileReaded = std::make_shared<FileReaded>(file, config);
 			readedFiles.push_back(fileReaded);
 		}
-		cout << endl;
 		if (!isNotRun) {
 			run();
 		}
@@ -172,7 +169,6 @@ public:
 			}
 		}
 		// After we need reset groups into files because unblock smart pointers
-		// TODO think about auto reset
 		for (auto& file : readedFiles) {
 			file->eqGroup.reset();
 		}

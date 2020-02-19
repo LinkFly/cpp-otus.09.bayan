@@ -106,7 +106,6 @@ class FileReaded {
 		return true;
 	}
 public:
-	// TODO!!! Maybe don't using id
 	static inline Id nextId = 0;
 	Id id;
 	PEqualGroup eqGroup;

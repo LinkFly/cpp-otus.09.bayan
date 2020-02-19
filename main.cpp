@@ -3,6 +3,9 @@
 #include "Config.h"
 #include "Bayan.h"
 
+//for debugging
+#include <iostream>
+using std::cout;
 class App {
 	void help() {
 		Arguments::showDesc();
@@ -28,6 +31,7 @@ public:
 	}
 
 	void run() {
+		cout << "-------------\n";
 		std::unique_ptr<Bayan> pbayan;
 		if (Arguments::dir != "") {
 			pbayan = std::make_unique<Bayan>(config, Arguments::dir);
@@ -35,7 +39,6 @@ public:
 		else {
 			pbayan = std::make_unique<Bayan>(config, Arguments::files);
 		}
-		// TODO Delete newlines before output
 		pbayan->printGroups(cout);
 	}
 };
