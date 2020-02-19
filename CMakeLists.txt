@@ -33,7 +33,7 @@ set_target_properties(bayan tests PROPERTIES
 	CXX_STANDARD_REQUIRED ON
 	)
 
-find_package(Boost COMPONENTS unit_test_framework filesystem program_options REQUIRED)
+find_package(Boost 1.71 COMPONENTS unit_test_framework filesystem program_options REQUIRED)
 
 target_link_libraries(bayan
 # Disable all boost libraries link (will be concrete linking)
