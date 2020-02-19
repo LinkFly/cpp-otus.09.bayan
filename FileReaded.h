@@ -10,7 +10,6 @@
 #include "share.h"
 #include "share-types.h"
 #include "Config.h"
-//#include "EqualGroup.h"
 #include "Block.h"
 #include "Hash.h"
 #include "FilesUtils.h"

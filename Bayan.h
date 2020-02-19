@@ -41,28 +41,11 @@ using Id = uint8_t;
 using PFileReaded = shared_ptr<FileReaded>;
 
 class Bayan {
-	class EqualGroupsCollection {
-		list<PEqualGroup> equalGroups;
-	public:
-
-		void add(PEqualGroup& group) {
-			equalGroups.push_back(group);
-		}
-		void forEach(std::function<void(PEqualGroup & group)> fnGroupProcess) {
-			for (auto group : equalGroups) {
-				fnGroupProcess(group);
-			}
-		}
-	};
-
-	vector<string> files;
-	vector<PFileReaded> readedFiles;
-	EqualGroupsCollection groupsCol;
 	const Config& config;
+	vector<PFileReaded> readedFiles;
+	list<PEqualGroup> equalGroups;
 
 	enum class CompareResult : int8_t { Unknown = -1, NotEqual, Equal };
-
-private:
 	class CheckTable {
 		map<std::tuple<Id, Id>, bool> negTable;
 	public:
@@ -87,7 +70,7 @@ private:
 		if (result) {
 			if (fileLeft->isEmptyGroup() && fileLeft->isEmptyGroup()) {
 				PEqualGroup eqGroup = std::make_shared<EqualGroup>();
-				groupsCol.add(eqGroup);
+				equalGroups.push_back(eqGroup);
 				eqGroup->add(fileLeft);
 				eqGroup->add(fileRight);
 				fileLeft->eqGroup = eqGroup;
@@ -148,41 +131,6 @@ private:
 		return dirPath.lexically_normal().string();
 	}
 
-public:
-	struct Utils {
-		static string normalizeFilePath(const string& sPath) {
-			return FilesUtils::normalizeFilePath(sPath);
-		}
-	};
-
-	Bayan(const Config& config, vector<string> files, bool isNotRun = false): config(config), files(files) {
-		for (auto file : files) {
-			auto fileReaded = std::make_shared<FileReaded>(file, config);
-			readedFiles.push_back(fileReaded);
-		}
-		cout << endl;
-		if (!isNotRun) {
-			run();
-		}
-	}
-
-	Bayan(const Config& config, string dir, bool isNotRun = false):
-		Bayan(config, FilesUtils::getFiles(prepareDir(dir)), isNotRun) {}
-
-	void run() {
-		size_t size = readedFiles.size();
-		for (size_t i = 0; i < size - 1; i++) {
-			auto curLeftFile = readedFiles[i];
-			for (size_t j = i + 1; j < size; j++) {
-				compareFiles(curLeftFile, readedFiles[j]);
-			}
-		}
-		// After we need reset groups into files because unblock smart pointers
-		for (auto& file : readedFiles) {
-			file->eqGroup.reset();
-		}
-	}
-
 	void compareFiles(PFileReaded& fileLeft, PFileReaded& fileRight) {
 		CompareResult checkRes = checkCompareResult(fileLeft, fileRight);
 		bool isEqual;
@@ -195,13 +143,48 @@ public:
 		}
 	}
 
+public:
+	struct Utils {
+		static string normalizeFilePath(const string& sPath) {
+			return FilesUtils::normalizeFilePath(sPath);
+		}
+	};
+
+	Bayan(const Config& config, vector<string> files, bool isNotRun = false) : config(config) {
+		for (auto file : files) {
+			auto fileReaded = std::make_shared<FileReaded>(file, config);
+			readedFiles.push_back(fileReaded);
+		}
+		cout << endl;
+		if (!isNotRun) {
+			run();
+		}
+	}
+
+	Bayan(const Config& config, string dir, bool isNotRun = false) :
+		Bayan(config, FilesUtils::getFiles(prepareDir(dir)), isNotRun) {}
+
+	void run() {
+		size_t size = readedFiles.size();
+		for (size_t i = 0; i < size - 1; i++) {
+			auto curLeftFile = readedFiles[i];
+			for (size_t j = i + 1; j < size; j++) {
+				compareFiles(curLeftFile, readedFiles[j]);
+			}
+		}
+		// After we need reset groups into files because unblock smart pointers
+		// TODO think about auto reset
+		for (auto& file : readedFiles) {
+			file->eqGroup.reset();
+		}
+	}
 	void printGroups(std::ostream& out) {
-		groupsCol.forEach([&out](PEqualGroup& group) {
+		for (auto group : equalGroups) {
 			group->forEachWhile([&out](PFileReaded& file) {
 				out << file->getFilePath() << endl;
 				return true;
-			});
+				});
 			out << endl;
-		});
+		}
 	}
 };
