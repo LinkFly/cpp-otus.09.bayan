@@ -8,31 +8,21 @@
 #include <iostream>
 
 #include "share-types.h"
+#include "FileReaded.h"
 
 using std::string;
 using std::cout;
 
-#include "FileReaded.h"
-//class FileReaded;
-
-class EqualGroupBase {
-	/*static inline Id nextId = 0;*/
-public:
-	/*Id id = nextId++;*/
+class EqualGroup {
 	std::map<string, PFileReaded> filesSet;
-	EqualGroupBase() = default;
-	EqualGroupBase(PFileReaded file): EqualGroupBase() {
+public:
+	EqualGroup() = default;
+	EqualGroup(PFileReaded file): EqualGroup() {
 		add(file);
 	}
-	~EqualGroupBase() {
-		/*cout << "===================== ~EqualGroupBase (id = " << (int)id << ") =======================\n";*/
-	}
 	void add(PFileReaded file) {
-		/*filesSet.emplace(file->getFilePath(), file);*/
-		/*FileReaded f;*/
-		/*string filePath = file->getFilePath();*/
-		/*filesSet[filePath] = file;*/
-		/*filesSet.insert(std::tuple<Id, PFileReaded>(id, file));*/
+		string filePath = file->getFilePath();
+		filesSet[filePath] = file;
 	}
 
 	void forEachWhile(std::function<bool(PFileReaded fileReaded)> fnFileProcess) {

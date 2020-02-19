@@ -1,9 +1,5 @@
 ﻿#pragma once
 
-//#define _CRTDBG_MAP_ALLOC
-//#include <stdlib.h>
-//#include <crtdbg.h>
-
 #include "share.h"
 
 #include <iostream>
@@ -21,6 +17,7 @@
 #include "share-types.h"
 #include "Config.h"
 #include "FileReaded.h"
+#include "EqualGroup.h"
 #include "Hash.h"
 #include "FilesUtils.h"
 
@@ -40,36 +37,24 @@ using std::make_shared;
 
 namespace fs = boost::filesystem;
 
-class EqualGroup : public EqualGroupBase {
-public:
-	friend class EqualGroupBase;
-	void add(PFileReaded file) {
-		string filePath = file->getFilePath();
-		filesSet[filePath] = file;
-	}
-	~EqualGroup() {
-		/*cout << "===================== ~EqualGroup =======================\n";*/
-	}
-};
-
-class EqualGroupsCollection {
-	list<PEqualGroup> equalGroups;
-public:
-
-	void add(PEqualGroup& group) {
-		equalGroups.push_back(group);
-	}
-	void forEach(std::function<void(PEqualGroup & group)> fnGroupProcess) {
-		for (auto group : equalGroups) {
-			fnGroupProcess(group);
-		}
-	}
-};
-
 using Id = uint8_t;
 using PFileReaded = shared_ptr<FileReaded>;
 
 class Bayan {
+	class EqualGroupsCollection {
+		list<PEqualGroup> equalGroups;
+	public:
+
+		void add(PEqualGroup& group) {
+			equalGroups.push_back(group);
+		}
+		void forEach(std::function<void(PEqualGroup & group)> fnGroupProcess) {
+			for (auto group : equalGroups) {
+				fnGroupProcess(group);
+			}
+		}
+	};
+
 	vector<string> files;
 	vector<PFileReaded> readedFiles;
 	EqualGroupsCollection groupsCol;
