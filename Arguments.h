@@ -16,7 +16,7 @@ using std::vector;
 string helpHeader = string{}
 + "Welcome to `bayan` program! It look for equal files\n"
 + "Usage:"
-+ "./bayan --block-size <block_size> hash-type <crc32|md5|sha1> [--dir <директория>] | [<file>*]\n" 
++ "./bayan --block-size <block_size> hash-type <crc32|md5|sha1> [--dir <пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ>] | [<file>*]\n"
 + "General options";
 
 struct Arguments {
@@ -56,7 +56,7 @@ struct Arguments {
             showDesc();
             exit(-1);
         }
-       
+
 	}
 
     static void showDesc() {
