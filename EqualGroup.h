@@ -7,7 +7,6 @@
 #include <string>
 #include <iostream>
 
-#include "share-types.h"
 #include "FileReaded.h"
 
 using std::string;

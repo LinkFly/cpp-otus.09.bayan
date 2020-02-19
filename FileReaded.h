@@ -8,11 +8,11 @@
 #include <boost/filesystem.hpp>
 
 #include "share.h"
-#include "share-types.h"
 #include "Config.h"
 #include "Block.h"
 #include "Hash.h"
 #include "FilesUtils.h"
+#include "logger.h"
 
 namespace fs = boost::filesystem;
 
@@ -106,6 +106,7 @@ class FileReaded {
 		return true;
 	}
 public:
+	// TODO!!! Maybe don't using id
 	static inline Id nextId = 0;
 	Id id;
 	PEqualGroup eqGroup;
@@ -131,6 +132,7 @@ public:
 	}
 
 	void startReading() {
+		logger(getFilePath(), "[START_READ]");
 		open();
 		curBlockNumber = 0;
 		isStartedReading = true;
@@ -150,14 +152,24 @@ public:
 		return false;
 	}
 
+	void finishReadingIfNotFinished() {
+		if (isOpen()) {
+			finishReading();
+			return;
+		}
+		logger(getFilePath(), "[FINISHED_ALREADY]");
+	}
 	void finishReading() {
 		close();
 		curBlockNumber = 0;
 		isStartedReading = false;
+		logger(getFilePath(), "[FINISH_READ]");
 	}
 
 	bool readNextHash(shared_ptr<Hash>& hash) {
+		logger(getFilePath(), "[NEXT_READ]");
 		if (tryGetInCache(hash)) {
+			logger(getFilePath(), "[FOUND_IN_CACHE]");
 			++curBlockNumber;
 			return true;
 		}
@@ -166,7 +178,8 @@ public:
 		Block block{ config.blockSize };
 		auto res = readBlock(block, curBlockNumber);
 		if (!res) {
-			finishReading();
+			logger(getFilePath(), "[ALL_READED]");
+			finishReadingIfNotFinished();
 			return false;
 		}
 		++curBlockNumber;

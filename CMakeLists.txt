@@ -6,7 +6,7 @@ set(SOURCES
 	)
 set(HEADERS
 	share.h
-	share-types.h
+	logger.h
 	Config.h
 	Block.h
 	Hash.h
@@ -23,6 +23,8 @@ set(DATA_FILES
 	Readme.md
 
 	)
+option(LOGS "Enable output logs" false)
+configure_file(configure.h.in configure.h)
 
 add_executable(bayan ${SOURCES} ${HEADERS} ${DATA_FILES})
 add_executable(tests tests.cpp ${TESTS_HEADERS} ${HEADERS})

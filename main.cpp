@@ -1,5 +1,4 @@
 ﻿#include "share.h"
-#include "share-types.h"
 #include "Arguments.h"
 #include "Config.h"
 #include "Bayan.h"

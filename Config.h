@@ -3,8 +3,6 @@
 #include <string>
 #include <map>
 
-#include "share-types.h"
-
 using std::string;
 using std::map;
 

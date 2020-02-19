@@ -14,7 +14,6 @@
 
 #include <boost/filesystem.hpp>
 
-#include "share-types.h"
 #include "Config.h"
 #include "FileReaded.h"
 #include "EqualGroup.h"
@@ -118,8 +117,8 @@ class Bayan {
 				break;
 			}
 		}
-		fileLeft->finishReading();
-		fileRight->finishReading();
+		fileLeft->finishReadingIfNotFinished();
+		fileRight->finishReadingIfNotFinished();
 		return res;
 	}
 
