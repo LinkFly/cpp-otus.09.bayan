@@ -4,11 +4,11 @@ compiler: clang
 addons:
   apt:
     packages:
-     - libboost-test-dev
-     - libboost-filesystem-dev
-     - libboost-program-options-dev
+     #- libboost-test-dev
+     #- libboost-filesystem-dev
+     #- libboost-program-options-dev
      #- python3-pip
-#    - libboost-all-dev # it works
+    - libboost-all-dev # it works
 
 # for tech commit
 script:

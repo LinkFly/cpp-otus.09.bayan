@@ -29,7 +29,7 @@ public:
 		SupportedHashType hashType = normalizeHashType(Arguments::hashType);
 		Config config{ Arguments::blockSize , hashType };
 	}
-
+	//
 	void run() {
 		cout << "-------------\n";
 		std::unique_ptr<Bayan> pbayan;
