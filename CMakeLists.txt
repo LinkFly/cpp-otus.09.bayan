@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16.2)
+cmake_minimum_required(VERSION 3.2)
 project(bayan VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 
 set(SOURCES
