@@ -9,7 +9,7 @@
 #include <sstream>
 #include <map>
 
-#include "bayan.h"
+#include "Bayan.h"
 
 using std::string;
 using std::cout;
@@ -78,9 +78,9 @@ void _getWaitStringFromGroupsFiles(const string& testDir, const vector<vector<st
 }
 
 bool _shareTestCode(const string& testDir, const vector<vector<string>>& waitGroups,
-	SupportedHashTypes usingHashType = SupportedHashTypes::Debug
+	SupportedHashType usingHashType = SupportedHashType::Debug
 ) {
-	BayanConfig config;
+	Config config;
 	config.blockSize = 5;
 	config.curHashType = usingHashType;
 
@@ -151,19 +151,19 @@ bool recurse_test() {
 
 bool recurse_test_with_crc32() {
 	return call_test(__PRETTY_FUNCTION__, []() {
-		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, SupportedHashTypes::CRC32);
+		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, SupportedHashType::CRC32);
 	});
 }
 
 bool recurse_test_with_md5() {
 	return call_test(__PRETTY_FUNCTION__, []() {
-		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, SupportedHashTypes::MD5);
+		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, SupportedHashType::MD5);
 		});
 }
 
 bool recurse_test_with_sha1() {
 	return call_test(__PRETTY_FUNCTION__, []() {
-		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, SupportedHashTypes::SHA1);
+		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, SupportedHashType::SHA1);
 		});
 }
 

@@ -7,7 +7,7 @@ set(SOURCES
 set(HEADERS
 	share.h
 	share-types.h
-	BayanConfig.h
+	Config.h
 	Block.h
 	Hash.h
 	EqualGroup.h

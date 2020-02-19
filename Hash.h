@@ -44,21 +44,21 @@ class Hash {
 public:
 	Block hashBlock;
 	Hash() = default;
-	Hash(const Block& block, SupportedHashTypes hashType) {
+	Hash(const Block& block, SupportedHashType hashType) {
 		init(block, hashType);
 	}
-	void init(const Block& block, SupportedHashTypes hashType) {
+	void init(const Block& block, SupportedHashType hashType) {
 		switch (hashType) {
-		case SupportedHashTypes::Debug:
+		case SupportedHashType::Debug:
 			hashBlock = block;
 			break;
-		case SupportedHashTypes::CRC32:
+		case SupportedHashType::CRC32:
 			crc32(block);
 			break;
-		case SupportedHashTypes::MD5:
+		case SupportedHashType::MD5:
 			md5(block);
 			break;
-		case SupportedHashTypes::SHA1:
+		case SupportedHashType::SHA1:
 			sha1(block);
 			break;
 		}

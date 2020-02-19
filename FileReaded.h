@@ -9,7 +9,7 @@
 
 #include "share.h"
 #include "share-types.h"
-#include "BayanConfig.h"
+#include "Config.h"
 #include "EqualGroup.h"
 #include "Block.h"
 #include "Hash.h"
@@ -30,7 +30,7 @@ class FileReaded {
 	bool isStartedReading = false;
 	vector<shared_ptr<Hash>> blocksHashes;
 	string filePath = "";
-	const BayanConfig& config;
+	const Config& config;
 
 	void maybeError() {
 		if (!pfile->good() && !pfile->eof()) {
@@ -111,7 +111,7 @@ public:
 	Id id;
 	PEqualGroup eqGroup;
 
-	FileReaded(const string& filePath, const BayanConfig& config): /*FileReaded()*/ config { config } {
+	FileReaded(const string& filePath, const Config& config): config { config } {
 		id = nextId++;
 		path = filePath;
 	}
@@ -164,9 +164,7 @@ public:
 		}
 		maybeStartReading();
 
-		auto blockSize = config.blockSize;
-		Block block{ blockSize };
-
+		Block block{ config.blockSize };
 		auto res = readBlock(block, curBlockNumber);
 		if (!res) {
 			finishReading();

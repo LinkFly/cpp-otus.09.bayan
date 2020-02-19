@@ -18,7 +18,8 @@
 
 #include <boost/filesystem.hpp>
 
-#include "BayanConfig.h"
+#include "share-types.h"
+#include "Config.h"
 #include "FileReaded.h"
 #include "Hash.h"
 #include "FilesUtils.h"
@@ -72,7 +73,7 @@ class Bayan {
 	vector<string> files;
 	vector<PFileReaded> readedFiles;
 	EqualGroupsCollection groupsCol;
-	const BayanConfig& config;
+	const Config& config;
 
 	enum class CompareResult : int8_t { Unknown = -1, NotEqual, Equal };
 
@@ -169,7 +170,7 @@ public:
 		}
 	};
 
-	Bayan(const BayanConfig& config, vector<string> files, bool isNotRun = false): config(config), files(files) {
+	Bayan(const Config& config, vector<string> files, bool isNotRun = false): config(config), files(files) {
 		for (auto file : files) {
 			auto fileReaded = std::make_shared<FileReaded>(file, config);
 			readedFiles.push_back(fileReaded);
@@ -180,7 +181,7 @@ public:
 		}
 	}
 
-	Bayan(const BayanConfig& config, string dir, bool isNotRun = false):
+	Bayan(const Config& config, string dir, bool isNotRun = false):
 		Bayan(config, FilesUtils::getFiles(prepareDir(dir)), isNotRun) {}
 
 	void run() {

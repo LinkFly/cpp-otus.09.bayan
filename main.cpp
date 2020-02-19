@@ -8,7 +8,7 @@
 #include <boost/program_options.hpp>
 
 #include "Arguments.h"
-#include "BayanConfig.h"
+#include "Config.h"
 #include "Bayan.h"
 
 namespace fs = boost::filesystem;
@@ -27,9 +27,9 @@ void checkBlockSize(const size_t& blockSize) {
 	}
 }
 
-SupportedHashTypes normalizeHashType(const string& sHashType) {
-	SupportedHashTypes curHashType;
-	bool res = BayanConfig::toSupportedHashType(sHashType, curHashType);
+SupportedHashType normalizeHashType(const string& sHashType) {
+	SupportedHashType curHashType;
+	bool res = Config::toSupportedHashType(sHashType, curHashType);
 	if (!res) {
 		help();
 		exit(-1);
@@ -41,8 +41,8 @@ int main(int argc, char** argv) {
 	Arguments::parse(argc, argv);
 
 	checkBlockSize(Arguments::blockSize);
-	SupportedHashTypes hashType = normalizeHashType(Arguments::hashType);
-	BayanConfig config{Arguments::blockSize , hashType};
+	SupportedHashType hashType = normalizeHashType(Arguments::hashType);
+	Config config{Arguments::blockSize , hashType};
 
 	std::unique_ptr<Bayan> pbayan;
 	if (Arguments::dir != "") {
