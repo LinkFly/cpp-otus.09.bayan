@@ -3,8 +3,8 @@
 #include <cstring>
 
 #include <boost/crc.hpp>
-//#include <boost/uuid/detail/md5.hpp>
-//#include <boost/uuid/detail/sha1.hpp>
+#include <boost/uuid/detail/md5.hpp>
+#include <boost/uuid/detail/sha1.hpp>
 
 #include "Block.h"
 
