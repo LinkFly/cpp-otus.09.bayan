@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <cstdint>
+#include <memory>
 
 using std::cerr;
 using std::endl;
@@ -29,3 +30,5 @@ using PEqualGroup = std::shared_ptr<EqualGroup>;
 enum class SupportedHashType {
 	Debug, CRC32, MD5, SHA1
 };
+
+

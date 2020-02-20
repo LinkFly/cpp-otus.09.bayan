@@ -4,11 +4,11 @@ compiler: clang
 addons:
   apt:
     packages:
-     - libboost1.71-test-dev
-     - libboost1.71-filesystem-dev
-     - libboost1.71-program-options-dev
+#     - libboost-test-dev
+#     - libboost-filesystem-dev
+#     - libboost-program-options-dev
      #- python3-pip
-     #- libboost1.71-all-dev # it works
+#    - libboost-all-dev # it works
 
 # for tech commit
 script:
@@ -17,10 +17,26 @@ script:
 - ls
 - mkdir build
 - cd build
+- export boost_version=1_72_0
+- export boost_ptversion=1.72.0
+- export boost_factory="$(pwd)/boost_factory"
+- export boost_prefix="$boost_factory/usr/lib/boost_$boost_version"
+- echo "[INFO] boost_factory = $boost_factory"
+- echo "[INFO] boost_prefix = $boost_prefix"
+- echo "[INFO] boost_version = $boost_version"
+- echo "[INFO] boost_ptversion = $boost_ptversion"
+- ../build-boost.sh "$boost_factory" "$boost_prefix" "$boost_version" "$boost_ptversion"
 #- conan install ..
+- export BOOST_ROOT="$boost_prefix"
+- export BOOST_LIBRARYDIR="$boost_prefix/lib"
+- export BOOST_INCLUDEDIR="$boost_prefix/include"
+- echo "[INFO] BOOST_ROOT = $BOOST_ROOT"
+- echo "[INFO] BOOST_LIBRARYDIR = $BOOST_LIBRARYDIR"
+- echo "[INFO] BOOST_INCLUDEDIR = $BOOST_INCLUDEDIR"
 - cmake ..
 - cmake --build .
 - cmake --build . --target tests
+- ../prepare-config "$BOOST_LIBRARYDIR"
 - cmake --build . --target package
 deploy:
   provider: script

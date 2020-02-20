@@ -13,7 +13,8 @@ using std::endl;
 //#define LOGS 1
 
 struct Logger {
-	Logger([[maybe_unused]] ostream& out = std::cout, std::string prefix = "", std::string suffix = "", std::string ending = "") :
+	// [[maybe_unused]] - since C++17
+	Logger(/*[[maybe_unused]]*/ ostream& out = std::cout, std::string prefix = "", std::string suffix = "", std::string ending = "") :
 		_prefix(prefix), _suffix(suffix), _ending(ending), _out(out) {
 	}
 	template<typename Arg, typename ...Args>

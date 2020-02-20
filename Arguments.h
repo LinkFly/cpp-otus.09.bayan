@@ -19,15 +19,31 @@ string helpHeader = string{}
 + "./bayan --block-size <block_size> hash-type <crc32|md5|sha1> [--dir <directory>] | [<file>*]\n"
 + "General options";
 
+#ifdef _MSC_VER
+#define _GLIBCXX_USE_NOEXCEPT
+#endif
+struct MyException : public std::exception {
+  char const* errMes;
+  MyException(char const* mes): errMes{mes} {}
+  virtual const char* what() const _GLIBCXX_USE_NOEXCEPT override {
+    return errMes;
+  }
+};
+    
 struct Arguments {
-    static inline po::options_description desc = po::options_description(helpHeader.c_str());
-    static inline string hashType;
-    static inline size_t blockSize;
-    static inline vector<string> files;
-    static inline string dir;
+    std::unique_ptr<po::options_description> desc;
+    string hashType;
+    size_t blockSize;
+    vector<string> files;
+    string dir;
 
-	static void parse(int argc, char** argv) {
-        desc.add_options()
+    Arguments() {
+      // make_unique since c++14
+      //desc = std::make_unique<po::options_description>(helpHeader.c_str());
+      desc.reset(new po::options_description(helpHeader.c_str()));
+    }
+	void parse(int argc, char** argv) {
+        desc->add_options()
             ("help,h", "Show help")
             ("block-size,s", po::value<size_t>(&blockSize)->required(), "Select block size (must be > 0)")
             ("hash-type,t", po::value<std::string>(&hashType)->required(), "Select hashType: crc32, md5, sha1")
@@ -41,7 +57,7 @@ struct Arguments {
 
         po::variables_map vm;
         try {
-            auto options = po::command_line_parser(argc, argv).options(desc).positional(posOptions);
+            auto options = po::command_line_parser(argc, argv).options(*desc).positional(posOptions);
             po::parsed_options parsed = options.run();
             po::store(parsed, vm);
             if (vm.count("help")) {
@@ -59,20 +75,20 @@ struct Arguments {
 
 	}
 
-    static void showDesc() {
-        std::cout << desc << std::endl;
+    void showDesc() {
+        std::cout << *desc << std::endl;
     }
 
-	static void check_arguments(const po::variables_map& vm) throw(std::exception)
+	void check_arguments(const po::variables_map& vm) throw(std::exception)
 	{
         if (blockSize == 0) {
-            throw std::exception("Failed: --block-size must be > 0");
+	  throw MyException("Failed: --block-size must be > 0");
         }
         if (vm.count("dir") && vm.count("file")) {
-            throw std::exception("Failed: denied both --dir and --file options");
+            throw MyException("Failed: denied both --dir and --file options");
         }
         if (vm.count("file") && vm["file"].as<vector<string>>().size() <= 1) {
-            throw std::exception("Failed: --file options count must be > 1 (or --dir options must be have)");
+            throw MyException("Failed: --file options count must be > 1 (or --dir options must be have)");
         }
 	}
 };

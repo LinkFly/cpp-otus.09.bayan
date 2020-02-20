@@ -1,0 +1,16 @@
+LD_LIBRARY_PATH="$1"
+echo "LD_LIBRARY_PATH="$LD_LIBRARY_PATH"">bayan-config.conf
+
+wrapTo() {
+main=$1
+wrapped=$2
+mv $main $wrapped
+echo ". bayan-config.conf">$main
+echo "echo "$LD_LIBRARY_PATH"">>$main
+echo "LD_LIBRARY_PATH="$LD_LIBRARY_PATH" ./$wrapped \$*">>$main
+chmod u+x $main
+chmod u+x $wrapped
+}
+
+wrapTo tests tests-orig
+wrapTo bayan bayan-orig

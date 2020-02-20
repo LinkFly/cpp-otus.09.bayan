@@ -3,17 +3,21 @@
 #include "Config.h"
 #include "Bayan.h"
 
-//for debugging
 #include <iostream>
 using std::cout;
 class App {
+	Arguments arguments{};
+public:
+	Config config{};
+private:
+
 	void help() {
-		Arguments::showDesc();
+		arguments.showDesc();
 	}
 
 	SupportedHashType normalizeHashType(const string& sHashType) {
 		SupportedHashType curHashType;
-		bool res = Config::toSupportedHashType(sHashType, curHashType);
+		bool res = config.toSupportedHashType(sHashType, curHashType);
 		if (!res) {
 			help();
 			exit(-1);
@@ -22,22 +26,24 @@ class App {
 	}
 
 public:
-	Config config;
+	
 
 	App(int argc, char** argv) {
-		Arguments::parse(argc, argv);
-		SupportedHashType hashType = normalizeHashType(Arguments::hashType);
-		Config config{ Arguments::blockSize , hashType };
+		arguments.parse(argc, argv);
+		SupportedHashType hashType = normalizeHashType(arguments.hashType);
+		Config config{ arguments.blockSize , hashType };
+		
 	}
 	//
 	void run() {
-		cout << "-------------\n";
 		std::unique_ptr<Bayan> pbayan;
-		if (Arguments::dir != "") {
-			pbayan = std::make_unique<Bayan>(config, Arguments::dir);
+		if (arguments.dir != "") {
+		  // pbayan = std::make_unique<Bayan>(config, arguments.dir); // make_unique since C++17
+		  pbayan.reset(new Bayan(config, arguments.dir));
 		}
 		else {
-			pbayan = std::make_unique<Bayan>(config, Arguments::files);
+		  // pbayan = std::make_unique<Bayan>(config, arguments.files); // make_unique since C++17
+		  pbayan.reset(new Bayan(config, arguments.files));
 		}
 		pbayan->printGroups(cout);
 	}
