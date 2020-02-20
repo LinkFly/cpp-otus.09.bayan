@@ -9,8 +9,8 @@ using std::map;
 class Config {
 	static inline std::map<string, SupportedHashType> hashTypeMap = {
 	{"crc32", SupportedHashType::CRC32},
-	{"md5", SupportedHashType::MD5},
-	{"sha1", SupportedHashType::SHA1}
+	//{"md5", SupportedHashType::MD5},
+	//{"sha1", SupportedHashType::SHA1}
 	};
 public:
 	Config() = default;

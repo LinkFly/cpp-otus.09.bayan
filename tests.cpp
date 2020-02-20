@@ -155,17 +155,17 @@ bool recurse_test_with_crc32() {
 	});
 }
 
-bool recurse_test_with_md5() {
-	return call_test(__PRETTY_FUNCTION__, []() {
-		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, SupportedHashType::MD5);
-		});
-}
-
-bool recurse_test_with_sha1() {
-	return call_test(__PRETTY_FUNCTION__, []() {
-		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, SupportedHashType::SHA1);
-		});
-}
+//bool recurse_test_with_md5() {
+//	return call_test(__PRETTY_FUNCTION__, []() {
+//		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, SupportedHashType::MD5);
+//		});
+//}
+//
+//bool recurse_test_with_sha1() {
+//	return call_test(__PRETTY_FUNCTION__, []() {
+//		return _shareTestCode("recurse_test", waitGroupsForRecurseLikeTests, SupportedHashType::SHA1);
+//		});
+//}
 
 void init_base_fixtures() {
 	// Init code must be here
@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE(test_of_bayan)
 	BOOST_CHECK(trivial_test_2_groups());
 	BOOST_CHECK(recurse_test());
 	BOOST_CHECK(recurse_test_with_crc32());
-	BOOST_CHECK(recurse_test_with_md5());
-	BOOST_CHECK(recurse_test_with_sha1());
+	//BOOST_CHECK(recurse_test_with_md5());
+	//BOOST_CHECK(recurse_test_with_sha1());
 }
 BOOST_AUTO_TEST_SUITE_END()
