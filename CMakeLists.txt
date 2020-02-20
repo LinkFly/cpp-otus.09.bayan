@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 message("[INFO] Using env variable `TRAVIS_BUILD_NUMBER` = $ENV{TRAVIS_BUILD_NUMBER}")
+message("[INFO] Using env variable `BOOST_ROOT` = $ENV{BOOST_ROOT}")
+message("[INFO] Using env variable `BOOST_INCLUDEDIR` = $ENV{BOOST_INCLUDEDIR}")
 message("[INFO] Using env variable `BOOST_LIBRARYDIR` = $ENV{BOOST_LIBRARYDIR}")
 project(bayan VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 
