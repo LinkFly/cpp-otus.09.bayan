@@ -17,7 +17,7 @@ script:
 - ls
 - mkdir build
 - cd build
-- ./build-boost.sh
+- ../build-boost.sh
 #- conan install ..
 - cmake ..
 - cmake --build .
