@@ -28,19 +28,15 @@ configure_file(configure.h.in configure.h)
 
 add_executable(bayan ${SOURCES} ${HEADERS} ${DATA_FILES})
 add_executable(tests tests.cpp ${TESTS_HEADERS} ${HEADERS})
-set_target_properties(bayan tests PROPERTIES
-	CXX_STANDARD 17
-	CXX_STANDARD_REQUIRED ON
-	)
+#set_target_properties(bayan tests PROPERTIES
+	#CXX_STANDARD 17
+	#CXX_STANDARD_REQUIRED ON
+#	)
 
 find_package(Boost COMPONENTS unit_test_framework filesystem program_options REQUIRED)
 
 target_link_libraries(bayan
-# Disable all boost libraries link (will be concrete linking)
-	#${Boost_LIBRARIES}
 	${Boost_FILESYSTEM_LIBRARY}
-# options_library don't work as dynamic library
-	#${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
 target_link_libraries(tests
@@ -50,16 +46,27 @@ target_link_libraries(tests
 message("[INFO] Boost libs: ${Boost_LIBRARIES}")
 message("[INFO] Boost inc: inc:${Boost_INCLUDE_DIR}")
 
+message("[INFO] Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+message("[INFO] Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
+
+#set_target_properties(bayan PROPERTIES
+#	COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
+#	INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
+#	LINK_DIRECTORIES ${Boost_LIBRARY_DIRS}
+#	)
+
 set_target_properties(bayan tests PROPERTIES
 	COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
-	INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
-	LINK_DIRECTORIES ${Boost_LIBRARY_DIRS}
+	#INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
+	#LINK_DIRECTORIES ${Boost_LIBRARY_DIRS}
+	INCLUDE_DIRECTORIES /home/user/lib/bootstrap/include
+	LINK_DIRECTORIES /home/user/lib/bootstrap/lib
 )
 
 IF(WIN32)
 set_target_properties(bayan tests PROPERTIES
   #COMPILE_OPTIONS "-Wall" # A lot of messages (in std libraries)
-  COMPILE_OPTIONS ""
+  COMPILE_OPTIONS "-std=c++17"
 )
 ELSE()
 set_target_properties(bayan tests PROPERTIES
