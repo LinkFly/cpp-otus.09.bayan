@@ -1,7 +1,9 @@
 #!/bin/bash
-echo $1
+
 boost_factory="$1"
 boost_prefix="$2"
+boost_version="$3"
+boost_ptversion="$4"
 
 mkdir -p boost-factory
 cd boost-factory
@@ -10,9 +12,9 @@ extract_log=extract.log
 
 mkdir -p sources
 cd sources
-wget https://dl.bintray.com/boostorg/release/1.72.0/source/boost_1_72_0.tar.gz
-tar -xvf boost_1_72_0.tar.gz > extract.log
-cd boost_1_72_0
+wget https://dl.bintray.com/boostorg/release/$ptversion/source/boost_$boost_version.tar.gz
+tar -xvf boost_$boost_version.tar.gz > extract.log
+cd boost_$boost_version
 
 ./bootstrap.sh --with-toolset=clang
 ./b2 --with-test --with-filesystem link=shared install --prefix="$boost_prefix"

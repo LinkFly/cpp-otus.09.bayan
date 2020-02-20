@@ -18,12 +18,14 @@ script:
 - mkdir build
 - cd build
 - export boost_version=1_72_0
+- export boost_ptversion=1.72.0
 - export boost_factory="$(pwd)/boost_factory"
 - export boost_prefix="$boost_factory/usr/lib/boost_$boost_version"
-- echo "[INFO] boost_version = $boost_version"
 - echo "[INFO] boost_factory = $boost_factory"
 - echo "[INFO] boost_prefix = $boost_prefix"
-- ../build-boost.sh "$boost_version" "$boost_factory" "$boost_prefix"
+- echo "[INFO] boost_version = $boost_version"
+- echo "[INFO] boost_ptversion = $boost_ptversion"
+- ../build-boost.sh "$boost_factory" "$boost_prefix" "$boost_version" "$boost_ptversion"
 #- conan install ..
 - export BOOST_ROOT="$boost_prefix"
 - export BOOST_LIBRARYDIR="$boost_prefix/lib"
