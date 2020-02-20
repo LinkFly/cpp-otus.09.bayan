@@ -4,9 +4,9 @@ compiler: clang
 addons:
   apt:
     packages:
-     - libboost-test-dev
-     - libboost-filesystem-dev
-     - libboost-program-options-dev
+#     - libboost-test-dev
+#     - libboost-filesystem-dev
+#     - libboost-program-options-dev
      #- python3-pip
 #    - libboost-all-dev # it works
 
@@ -17,11 +17,17 @@ script:
 - ls
 - mkdir build
 - cd build
-- ../build-boost.sh
+- export boost_version=1_72_0
+- export boost_factory="$(pwd)/boost_factory"
+- export boost_prefix="$boost_factory/usr/lib/boost_$boost_version"
+- ../build-boost.sh "$boost_version" "$boost_factory" "$boost_prefix"
 #- conan install ..
+- export BOOST_ROOT
+- export BOOST_LIBRARYDIR="$boost_prefix/lib"
 - cmake ..
 - cmake --build .
 - cmake --build . --target tests
+- ../prepare-config "$BOOST_LIBRARYDIR"
 - cmake --build . --target package
 deploy:
   provider: script
