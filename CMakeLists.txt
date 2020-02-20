@@ -35,13 +35,26 @@ set_target_properties(bayan tests PROPERTIES
 
 find_package(Boost COMPONENTS unit_test_framework filesystem program_options REQUIRED)
 
+IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+message("[INFO] Using MSVC")
 target_link_libraries(bayan
+	${Boost_FILESYSTEM_LIBRARY}
+)
+ELSE()
+message("[INFO] Using not MSVC")
+target_link_libraries(bayan
+	${Boost_FILESYSTEM_LIBRARY}
+	${Boost_PROGRAM_OPTIONS_LIBRARY}
+)
+ENDIF()
+
+#target_link_libraries(bayan
 # Disable all boost libraries link (will be concrete linking)
 	#${Boost_LIBRARIES}
-	${Boost_FILESYSTEM_LIBRARY}
+#	${Boost_FILESYSTEM_LIBRARY}
 # options_library don't work as dynamic library
 	#${Boost_PROGRAM_OPTIONS_LIBRARY}
-)
+#)
 
 target_link_libraries(tests
 	${Boost_LIBRARIES}
