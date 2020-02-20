@@ -99,6 +99,7 @@ install(TARGETS bayan-config.conf RUNTIME DESTINATION bin)
 install(TARGETS tests-orig RUNTIME DESTINATION lib/bayan/tests)
 install(TARGETS tests RUNTIME DESTINATION lib/bayan/tests)
 install(TARGETS tests-config.conf RUNTIME DESTINATION lib/bayan/tests)
+install(DIRECTORY boost_factory/usr/lib/boost_1_72_0 RUNTIME DESTINATION bin/boost_factory/usr/lib/boost_1_72_0)
 
 set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
