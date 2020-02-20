@@ -63,12 +63,12 @@ target_link_libraries(tests
 message("[INFO] Boost libs: ${Boost_LIBRARIES}")
 message("[INFO] Boost inc: ${Boost_INCLUDE_DIR}")
 message("[INFO] Boost inc dirs: ${Boost_INCLUDE_DIRS}")
-message("[INFO] Boost lib dirs: ${Boost_LIBRARY_DIRS}")
+message("[INFO] Boost lib dirs: $ENV{BOOST_LIBRARYDIR}")
 
 set_target_properties(bayan tests PROPERTIES
 	COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
 	INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
-	LINK_DIRECTORIES ${Boost_LIBRARY_DIRS}
+	LINK_DIRECTORIES $ENV{BOOST_LIBRARYDIR}
 )
 
 IF(WIN32)
