@@ -1,11 +1,11 @@
 LD_LIBRARY_PATH="$1"
-echo "LD_LIBRARY_PATH="$LD_LIBRARY_PATH"">bayan-config.conf
 
 wrapTo() {
 main=$1
 wrapped=$2
+echo "LD_LIBRARY_PATH="$LD_LIBRARY_PATH"">$main-config.conf
 mv $main $wrapped
-echo ". bayan-config.conf">$main
+echo ". $main-config.conf">$main
 echo "echo "$LD_LIBRARY_PATH"">>$main
 echo "LD_LIBRARY_PATH="$LD_LIBRARY_PATH" ./$wrapped \$*">>$main
 chmod u+x $main

@@ -93,8 +93,12 @@ add_test(bayan_tests tests)
 ###
 
 ### Packaging ###
+install(TARGETS bayan-orig RUNTIME DESTINATION bin)
 install(TARGETS bayan RUNTIME DESTINATION bin)
+install(TARGETS bayan-config.conf RUNTIME DESTINATION bin)
+install(TARGETS tests-orig RUNTIME DESTINATION lib/bayan/tests)
 install(TARGETS tests RUNTIME DESTINATION lib/bayan/tests)
+install(TARGETS tests-config.conf RUNTIME DESTINATION lib/bayan/tests)
 
 set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
