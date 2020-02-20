@@ -106,12 +106,19 @@ class FileReaded {
 		return true;
 	}
 public:
-	static inline Id nextId = 0;
+	static Id getNextId() {
+		static Id curId = 0;
+		return curId++;
+	}
+	static Id nextId;
 	Id id;
 	PEqualGroup eqGroup;
 
+	//static void init() {
+	//	nextId = 0;
+	//}
 	FileReaded(const string& filePath, const Config& config): config { config } {
-		id = nextId++;
+		id = getNextId();
 		path = filePath;
 	}
 

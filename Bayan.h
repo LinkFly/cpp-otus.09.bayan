@@ -83,14 +83,16 @@ class Bayan {
 					fileLeft->eqGroup = fileRight->eqGroup;
 				}
 			}
-			fileLeft->eqGroup->forEachWhile([this, &fileRight, &result](PFileReaded& file) {
+			auto fnForWhile = [this, &fileRight](PFileReaded& file) -> bool {
 				checkTable.save(file->id, fileRight->id, true);
 				return true;
-				});
-			fileRight->eqGroup->forEachWhile([this, &fileLeft, &result](PFileReaded& file) {
+			};
+			fileLeft->eqGroup->forEachWhile(fnForWhile);
+			auto forForWhile2 = [this, &fileLeft](PFileReaded& file) {
 				checkTable.save(file->id, fileLeft->id, true);
 				return true;
-				});
+			};
+			fileRight->eqGroup->forEachWhile(forForWhile2);
 		}
 	}
 
@@ -125,7 +127,7 @@ class Bayan {
 		if (!dirPath.is_absolute()) {
 			dirPath = (fs::current_path() / dirPath);
 		}
-		return dirPath.lexically_normal().string();
+		return (boost::filesystem::pathExt{ dirPath }).lexically_normal().string();
 	}
 
 	void compareFiles(PFileReaded& fileLeft, PFileReaded& fileRight) {
@@ -148,6 +150,7 @@ public:
 	};
 
 	Bayan(const Config& config, vector<string> files, bool isNotRun = false) : config(config) {
+		/*FileReaded::init();*/
 		for (auto file : files) {
 			auto fileReaded = std::make_shared<FileReaded>(file, config);
 			readedFiles.push_back(fileReaded);

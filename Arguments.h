@@ -20,14 +20,17 @@ string helpHeader = string{}
 + "General options";
 
 struct Arguments {
-    static inline po::options_description desc = po::options_description(helpHeader.c_str());
-    static inline string hashType;
-    static inline size_t blockSize;
-    static inline vector<string> files;
-    static inline string dir;
+    std::unique_ptr<po::options_description> desc;
+    string hashType;
+    size_t blockSize;
+    vector<string> files;
+    string dir;
 
-	static void parse(int argc, char** argv) {
-        desc.add_options()
+    Arguments() {
+        desc = std::make_unique<po::options_description>(helpHeader.c_str());
+    }
+	void parse(int argc, char** argv) {
+        desc->add_options()
             ("help,h", "Show help")
             ("block-size,s", po::value<size_t>(&blockSize)->required(), "Select block size (must be > 0)")
             ("hash-type,t", po::value<std::string>(&hashType)->required(), "Select hashType: crc32, md5, sha1")
@@ -41,7 +44,7 @@ struct Arguments {
 
         po::variables_map vm;
         try {
-            auto options = po::command_line_parser(argc, argv).options(desc).positional(posOptions);
+            auto options = po::command_line_parser(argc, argv).options(*desc).positional(posOptions);
             po::parsed_options parsed = options.run();
             po::store(parsed, vm);
             if (vm.count("help")) {
@@ -59,11 +62,11 @@ struct Arguments {
 
 	}
 
-    static void showDesc() {
+    void showDesc() {
         std::cout << desc << std::endl;
     }
 
-	static void check_arguments(const po::variables_map& vm) throw(std::exception)
+	void check_arguments(const po::variables_map& vm) throw(std::exception)
 	{
         if (blockSize == 0) {
             throw std::exception("Failed: --block-size must be > 0");

@@ -24,7 +24,8 @@ public:
 		filesSet[filePath] = file;
 	}
 
-	void forEachWhile(std::function<bool(PFileReaded fileReaded)> fnFileProcess) {
+	template<class Lambda>
+	void forEachWhile(const Lambda& fnFileProcess) {
 		for (auto file : filesSet) {
 			bool isNext = fnFileProcess(std::get<1>(file));
 			if (!isNext) {
@@ -32,6 +33,14 @@ public:
 			}
 		}
 	}
+	/*void forEachWhile(std::function<bool(PFileReaded fileReaded)> fnFileProcess) {
+		for (auto file : filesSet) {
+			bool isNext = fnFileProcess(std::get<1>(file));
+			if (!isNext) {
+				break;
+			}
+		}
+	}*/
 };
 
 

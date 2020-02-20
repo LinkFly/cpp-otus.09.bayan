@@ -29,7 +29,7 @@ configure_file(configure.h.in configure.h)
 add_executable(bayan ${SOURCES} ${HEADERS} ${DATA_FILES})
 add_executable(tests tests.cpp ${TESTS_HEADERS} ${HEADERS})
 set_target_properties(bayan tests PROPERTIES
-	CXX_STANDARD 17
+	CXX_STANDARD 11
 	CXX_STANDARD_REQUIRED ON
 	)
 
@@ -48,7 +48,9 @@ target_link_libraries(tests
 )
 
 message("[INFO] Boost libs: ${Boost_LIBRARIES}")
-message("[INFO] Boost inc: inc:${Boost_INCLUDE_DIR}")
+message("[INFO] Boost inc: ${Boost_INCLUDE_DIR}")
+message("[INFO] Boost inc dirs: ${Boost_INCLUDE_DIRS}")
+message("[INFO] Boost lib dirs: ${Boost_LIBRARY_DIRS}")
 
 set_target_properties(bayan tests PROPERTIES
 	COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
@@ -63,7 +65,8 @@ set_target_properties(bayan tests PROPERTIES
 )
 ELSE()
 set_target_properties(bayan tests PROPERTIES
-	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra;-Wno-c++17-extensions"
+	#COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra;-Wno-c++11-extensions"
+	COMPILE_OPTIONS ""
 )
 ENDIF()
 
