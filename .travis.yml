@@ -20,10 +20,17 @@ script:
 - export boost_version=1_72_0
 - export boost_factory="$(pwd)/boost_factory"
 - export boost_prefix="$boost_factory/usr/lib/boost_$boost_version"
+- echo "[INFO] boost_version = $boost_version"
+- echo "[INFO] boost_factory = $boost_factory"
+- echo "[INFO] boost_prefix = $boost_prefix"
 - ../build-boost.sh "$boost_version" "$boost_factory" "$boost_prefix"
 #- conan install ..
-- export BOOST_ROOT
+- export BOOST_ROOT="$boost_prefix"
 - export BOOST_LIBRARYDIR="$boost_prefix/lib"
+- export BOOST_INCLUDEDIR="$boost_prefix/include"
+- echo "[INFO] BOOST_ROOT = $BOOST_ROOT"
+- echo "[INFO] BOOST_LIBRARYDIR = $BOOST_LIBRARYDIR"
+- echo "[INFO] BOOST_INCLUDEDIR = $BOOST_INCLUDEDIR"
 - cmake ..
 - cmake --build .
 - cmake --build . --target tests
