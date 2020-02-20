@@ -19,6 +19,9 @@ string helpHeader = string{}
 + "./bayan --block-size <block_size> hash-type <crc32|md5|sha1> [--dir <directory>] | [<file>*]\n"
 + "General options";
 
+#ifdef _MSC_VER
+#define _GLIBCXX_USE_NOEXCEPT
+#endif
 struct MyException : public std::exception {
   char const* errMes;
   MyException(char const* mes): errMes{mes} {}
