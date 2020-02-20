@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 project(bayan VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
-
+set(CMAKE_CXX_COMPILER clang++)
+set(CMAKE_C_COMPILER clang)
 set(SOURCES
 	main.cpp
 	)
