@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <cstdint>
+#include <memory>
 
 using std::cerr;
 using std::endl;

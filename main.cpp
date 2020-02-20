@@ -38,10 +38,12 @@ public:
 	void run() {
 		std::unique_ptr<Bayan> pbayan;
 		if (arguments.dir != "") {
-			pbayan = std::make_unique<Bayan>(config, arguments.dir);
+		  // pbayan = std::make_unique<Bayan>(config, arguments.dir); // make_unique since C++17
+		  pbayan.reset(new Bayan(config, arguments.dir));
 		}
 		else {
-			pbayan = std::make_unique<Bayan>(config, arguments.files);
+		  // pbayan = std::make_unique<Bayan>(config, arguments.files); // make_unique since C++17
+		  pbayan.reset(new Bayan(config, arguments.files));
 		}
 		pbayan->printGroups(cout);
 	}

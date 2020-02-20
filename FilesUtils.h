@@ -28,7 +28,7 @@ namespace filesystem {
         pathExt(path curPath) : m_pathname{ curPath } {
 
         }
-		path pathExt::lexically_normal() const
+		path lexically_normal() const
 		{
 			return m_pathname;
 		}

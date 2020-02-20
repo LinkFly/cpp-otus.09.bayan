@@ -11,6 +11,7 @@
 #include <set>
 #include <fstream>
 #include <tuple>
+#include <memory>
 
 #include <boost/filesystem.hpp>
 
@@ -31,7 +32,6 @@ using std::list;
 
 using std::unique_ptr;
 using std::shared_ptr;
-using std::make_unique;
 using std::make_shared;
 
 namespace fs = boost::filesystem;

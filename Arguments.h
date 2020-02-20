@@ -19,6 +19,14 @@ string helpHeader = string{}
 + "./bayan --block-size <block_size> hash-type <crc32|md5|sha1> [--dir <directory>] | [<file>*]\n"
 + "General options";
 
+struct MyException : public std::exception {
+  char const* errMes;
+  MyException(char const* mes): errMes{mes} {}
+  virtual const char* what() const _GLIBCXX_USE_NOEXCEPT override {
+    return errMes;
+  }
+};
+    
 struct Arguments {
     std::unique_ptr<po::options_description> desc;
     string hashType;
@@ -27,7 +35,9 @@ struct Arguments {
     string dir;
 
     Arguments() {
-        desc = std::make_unique<po::options_description>(helpHeader.c_str());
+      // make_unique since c++14
+      //desc = std::make_unique<po::options_description>(helpHeader.c_str());
+      desc.reset(new po::options_description(helpHeader.c_str()));
     }
 	void parse(int argc, char** argv) {
         desc->add_options()
@@ -63,19 +73,19 @@ struct Arguments {
 	}
 
     void showDesc() {
-        std::cout << desc << std::endl;
+        std::cout << *desc << std::endl;
     }
 
 	void check_arguments(const po::variables_map& vm) throw(std::exception)
 	{
         if (blockSize == 0) {
-            throw std::exception("Failed: --block-size must be > 0");
+	  throw MyException("Failed: --block-size must be > 0");
         }
         if (vm.count("dir") && vm.count("file")) {
-            throw std::exception("Failed: denied both --dir and --file options");
+            throw MyException("Failed: denied both --dir and --file options");
         }
         if (vm.count("file") && vm["file"].as<vector<string>>().size() <= 1) {
-            throw std::exception("Failed: --file options count must be > 1 (or --dir options must be have)");
+            throw MyException("Failed: --file options count must be > 1 (or --dir options must be have)");
         }
 	}
 };
