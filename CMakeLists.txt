@@ -95,9 +95,9 @@ add_test(bayan_tests tests)
 ### Packaging ###
 install(TARGETS bayan RUNTIME DESTINATION bin)
 install(TARGETS tests RUNTIME DESTINATION lib/bayan/tests)
-install(FILES build/bayan-orig build/bayan-config.conf RUNTIME DESTINATION bin)
-install(FILES build/tests-orig build/tests-config.conf RUNTIME DESTINATION lib/bayan/tests)
-install(DIRECTORY build/boost_factory/usr/lib/boost_1_72_0 RUNTIME DESTINATION bin/boost_factory/usr/lib/boost_1_72_0)
+install(FILES build/bayan-orig build/bayan-config.conf DESTINATION bin)
+install(FILES build/tests-orig build/tests-config.conf DESTINATION lib/bayan/tests)
+install(DIRECTORY build/boost_factory/usr/lib/boost_1_72_0 DESTINATION bin/boost_factory/usr/lib/boost_1_72_0)
 
 set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
