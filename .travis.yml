@@ -36,7 +36,7 @@ script:
 - cmake ..
 - cmake --build .
 - cmake --build . --target tests
-- ../prepare-config "$BOOST_LIBRARYDIR"
+- ../prepare-config "$BOOST_LIBRARYDIR" "$(pwd)"
 - cmake --build . --target package
 deploy:
   provider: script

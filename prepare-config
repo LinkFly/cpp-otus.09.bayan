@@ -1,15 +1,28 @@
 LD_LIBRARY_PATH="$1"
+save_dir="$2"
 
 wrapTo() {
 main=$1
 wrapped=$2
-echo "LD_LIBRARY_PATH="$LD_LIBRARY_PATH"">$main-config.conf
-mv $main $wrapped
-echo ". $main-config.conf">$main
-echo "echo "$LD_LIBRARY_PATH"">>$main
-echo "LD_LIBRARY_PATH="$LD_LIBRARY_PATH" ./$wrapped \$*">>$main
-chmod u+x $main
-chmod u+x $wrapped
+echo "LD_LIBRARY_PATH="$LD_LIBRARY_PATH"">"$save_dir/$main-config.conf"
+echo "[INFO] Checking saved config: "$save_dir/$main-config.conf""
+
+mainfile="$save_dir/$main"
+wrappedfile="$save_dir/$wrapped"
+
+mv "$mainfile" "$wrappedfile"
+echo "[INFO] Wrapper file: "$mainfile""
+echo "[INFO] Wrapped file: "$wrappedfile""
+
+echo ". $main-config.conf">"$mainfile"
+echo "echo "$LD_LIBRARY_PATH"">>"$mainfile"
+echo "LD_LIBRARY_PATH="$LD_LIBRARY_PATH" ./$wrapped \$*">>"$mainfile"
+
+echo "[INFO] Checking saved wrapper: $(ls "$mainfile")"
+echo "[INFO] Checking saved wrapped: $(ls "$wrappedfile")"
+
+chmod u+x "$mainfile"
+chmod u+x "$wrappedfile"
 }
 
 wrapTo tests tests-orig
