@@ -14,7 +14,8 @@ mv "$mainfile" "$wrappedfile"
 echo "[INFO] Wrapper file: "$mainfile""
 echo "[INFO] Wrapped file: "$wrappedfile""
 
-echo ". $main-config.conf">"$mainfile"
+echo "cd $(dirname "$0"">"$mainfile"
+echo ". $main-config.conf">>"$mainfile"
 echo "echo "$LD_LIBRARY_PATH"">>"$mainfile"
 echo "LD_LIBRARY_PATH="$LD_LIBRARY_PATH" ./$wrapped \$*">>"$mainfile"
 
