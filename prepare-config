@@ -1,7 +1,8 @@
 #!/bin/bash
-
 rel_library_path="$1"
 save_dir="$2"
+
+echo "[INFO] rel_library_path = "$rel_library_path""
 
 wrapTo() {
 main=$1
