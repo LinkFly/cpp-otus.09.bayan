@@ -31,7 +31,9 @@ option(LOGS "Enable output logs" false)
 configure_file(configure.h.in configure.h)
 
 add_executable(bayan ${SOURCES} ${HEADERS} ${DATA_FILES})
+add_executable(bayan-orig stub.cpp)
 add_executable(tests tests.cpp ${TESTS_HEADERS} ${HEADERS})
+add_executable(tests-orig stub.cpp)
 set_target_properties(bayan tests PROPERTIES
 	CXX_STANDARD 11
 	CXX_STANDARD_REQUIRED ON
