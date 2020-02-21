@@ -6,7 +6,7 @@ save_dir="$2"
 wrapTo() {
 main=$1
 wrapped=$2
-echo "[INFO] rel_library_path="$rel_library_path"">"$save_dir/$main-config.conf"
+echo "rel_library_path="$rel_library_path"">"$save_dir/$main-config.conf"
 echo "[INFO] Checking saved config: "$save_dir/$main-config.conf""
 
 mainfile="$save_dir/$main"
