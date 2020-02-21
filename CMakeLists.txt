@@ -71,11 +71,19 @@ message("[INFO] Boost inc: ${Boost_INCLUDE_DIR}")
 message("[INFO] Boost inc dirs: ${Boost_INCLUDE_DIRS}")
 message("[INFO] Boost lib dirs: $ENV{BOOST_LIBRARYDIR}")
 
+IF(WIN32)
 set_target_properties(bayan tests PROPERTIES
 	COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
 	INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
 	LINK_DIRECTORIES $ENV{BOOST_LIBRARYDIR}
 )
+ELSE()
+	COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
+	INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
+	# Not setting by cmake (maybe old cmake)
+	#LINK_DIRECTORIES ${BOOST_LIBRARYDIR}
+	LINK_DIRECTORIES $ENV{BOOST_LIBRARYDIR}
+ENDIF()
 
 IF(WIN32)
 set_target_properties(bayan tests PROPERTIES
@@ -101,7 +109,7 @@ install(FILES build/bayan-config.conf DESTINATION bin)
 
 install(DIRECTORY build/boost_factory/usr/lib/boost_1_72_0 DESTINATION bin/boost_factory/usr/lib/)
 
-install(DIRECTORY tests DESTINATION lib/bayan/)
+install(DIRECTORY tests/fixtures DESTINATION lib/bayan/tests)
 install(TARGETS tests RUNTIME DESTINATION lib/bayan/tests)
 install(TARGETS tests-orig RUNTIME DESTINATION lib/bayan/tests)
 install(FILES build/tests-config.conf DESTINATION lib/bayan/tests)

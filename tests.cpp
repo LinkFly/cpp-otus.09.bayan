@@ -16,6 +16,8 @@ using std::cout;
 using std::endl;
 using std::clock;
 
+const string relpathPrefix{ "../tests/fixtures" };
+
 // Utils
 bool call_test(string name, std::function<bool(void)> fntest) {
 	cout << "------------------------------\n";
@@ -38,9 +40,6 @@ void _printDiffResAndWait(const string& testName, const string& res, const strin
 		<< res << "\n--------------\nWait Result:\n-----------------\n"
 		<< waitres << "\n-------------------------\n" << endl;
 }
-
-
-const string relpathPrefix{ "../tests/" };
 
 vector<vector<string>> _getWaitGroupsFiles(const string& testDir, const vector<vector<string>>& waitGroups) {
 	vector<vector<string>> res;
@@ -169,7 +168,11 @@ bool recurse_test_with_sha1() {
 
 void init_base_fixtures() {
 	// Init code must be here
-
+	cout << "Running tests ... \n";
+	if (!fs::exists(fs::path{ relpathPrefix })) {
+		cerr << "Bad directory with fixtures: relpathPrefix\n";
+		exit(-1);
+	}
 }
 
 struct Init {
