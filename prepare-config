@@ -1,12 +1,12 @@
 #!/bin/bash
 
-LD_LIBRARY_PATH="$1"
+rel_library_path="$1"
 save_dir="$2"
 
 wrapTo() {
 main=$1
 wrapped=$2
-echo "LD_LIBRARY_PATH="$LD_LIBRARY_PATH"">"$save_dir/$main-config.conf"
+echo "[INFO] rel_library_path="$rel_library_path"">"$save_dir/$main-config.conf"
 echo "[INFO] Checking saved config: "$save_dir/$main-config.conf""
 
 mainfile="$save_dir/$main"
@@ -18,8 +18,7 @@ echo "[INFO] Wrapped file: "$wrappedfile""
 
 echo "cd \"\$(dirname \"\$0\")\"">"$mainfile"
 echo ". $main-config.conf">>"$mainfile"
-echo "echo "$LD_LIBRARY_PATH"">>"$mainfile"
-echo "LD_LIBRARY_PATH="$LD_LIBRARY_PATH" ./$wrapped \$*">>"$mainfile"
+echo "LD_LIBRARY_PATH="\$(pwd)/$rel_library_path" ./$wrapped \$*">>"$mainfile"
 
 echo "[INFO] Checking saved wrapper: $(ls "$mainfile")"
 echo "[INFO] Checking saved wrapped: $(ls "$wrappedfile")"
