@@ -17,9 +17,9 @@ mv "$mainfile" "$wrappedfile"
 echo "[INFO] Wrapper file: "$mainfile""
 echo "[INFO] Wrapped file: "$wrappedfile""
 
-echo "cd \"\$(dirname \"\$0\")\"">"$mainfile"
+echo "this_dir=\"\$(dirname \"\$0\")\"">"$mainfile"
 echo ". $main-config.conf">>"$mainfile"
-echo "LD_LIBRARY_PATH=\"\$(pwd)/$rel_library_path\" ./$wrapped \$*">>"$mainfile"
+echo "LD_LIBRARY_PATH=\"\$this_dir/$rel_library_path\" \"\$this_dir/$wrapped\" \$*">>"$mainfile"
 
 echo "[INFO] Checking saved wrapper: $(ls "$mainfile")"
 echo "[INFO] Checking saved wrapped: $(ls "$wrappedfile")"
