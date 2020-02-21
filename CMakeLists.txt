@@ -71,18 +71,20 @@ message("[INFO] Boost inc: ${Boost_INCLUDE_DIR}")
 message("[INFO] Boost inc dirs: ${Boost_INCLUDE_DIRS}")
 message("[INFO] Boost lib dirs: $ENV{BOOST_LIBRARYDIR}")
 
-IF(WIN32)
+IF(MSVC)
 set_target_properties(bayan tests PROPERTIES
 	COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
 	INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
-	LINK_DIRECTORIES $ENV{BOOST_LIBRARYDIR}
+	LINK_DIRECTORIES ${Boost_LIBRARY_DIRS}
 )
 ELSE()
+set_target_properties(bayan tests PROPERTIES
 	COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
 	INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
-	# Not setting by cmake (maybe old cmake)
+	# TODO Not setting by cmake (maybe old cmake) - analyze it
 	#LINK_DIRECTORIES ${BOOST_LIBRARYDIR}
 	LINK_DIRECTORIES $ENV{BOOST_LIBRARYDIR}
+)
 ENDIF()
 
 IF(WIN32)
