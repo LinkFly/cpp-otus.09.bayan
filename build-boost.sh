@@ -5,6 +5,11 @@ prefix="$2"
 version="$3"
 ptversion="$4"
 
+echo "[INFO] factory: $factory"
+echo "[INFO] prefix: $prefix"
+echo "[INFO] version: $version"
+echo "[INFO] ptversion: $ptversions"
+
 mkdir -p boost-factory
 cd boost-factory
 
