@@ -32,6 +32,7 @@ public:
 		arguments.parse(argc, argv);
 		SupportedHashType hashType = normalizeHashType(arguments.hashType);
 		Config config{ arguments.blockSize , hashType };
+		this->config = config;
 		
 	}
 	//
