@@ -47,7 +47,7 @@ vector<vector<string>> _getWaitGroupsFiles(const string& testDir, const vector<v
 		/*size_t idx = 0;*/
 		vector<string> curGroup;
 		for (string& file : group) {
-			auto relFile = relpathPrefix + testDir + "/" + file;
+			auto relFile = relpathPrefix + "/" + testDir + "/" + file;
 			string curFile = Bayan::Utils::normalizeFilePath(relFile);
 			/*group[idx++] = curFile;*/
 			curGroup.push_back(curFile);
@@ -79,14 +79,12 @@ void _getWaitStringFromGroupsFiles(const string& testDir, const vector<vector<st
 bool _shareTestCode(const string& testDir, const vector<vector<string>>& waitGroups,
 	SupportedHashType usingHashType = SupportedHashType::Debug
 ) {
-	Config config;
-	config.blockSize = 5;
-	config.curHashType = usingHashType;
+	Config config{ 5, usingHashType };
 
 	std::ostringstream soutRes, soutWaitRes;
 	_getWaitStringFromGroupsFiles(testDir, waitGroups, soutWaitRes);
 
-	Bayan bayan(config, relpathPrefix + testDir, true);
+	Bayan bayan(config, relpathPrefix + "/" + testDir, true);
 	bayan.run();
 	bayan.printGroups(soutRes);
 	cout << "Result:\n-----------\n" << soutRes.str() << "-------------------" << endl;

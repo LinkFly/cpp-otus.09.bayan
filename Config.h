@@ -17,7 +17,8 @@ public:
 		};
 	}
 	Config(size_t blockSize, SupportedHashType curHashType) : Config() {
-
+		this->blockSize = blockSize;
+		this->curHashType = curHashType;
 	}
 	bool toSupportedHashType(const string& sHashType, SupportedHashType& hashType) {
 		auto res = hashTypeMap.find(sHashType);
